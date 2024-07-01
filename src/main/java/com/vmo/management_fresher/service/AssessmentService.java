@@ -10,9 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.Base64;
 
 @Service
 @RequiredArgsConstructor
@@ -39,7 +37,7 @@ public class AssessmentService {
                 typeAssessment != Constant.ASSESSMENT_LEVEL_1 &&
                 typeAssessment != Constant.ASSESSMENT_LEVEL_2 &&
                 typeAssessment != Constant.ASSESSMENT_LEVEL_3) {
-            throw new IllegalArgumentException("Invalid type-assessment value: " + typeAssessment);
+            throw new IllegalArgumentException("invalid-type-assessment-value: " + typeAssessment);
         }
         assessment.setTypeAssessment(typeAssessment);
         if(!centerRepo.existsById(centerId)){
