@@ -8,5 +8,5 @@ import java.util.Optional;
 
 @Repository
 public interface AssessmentRepo extends JpaRepository<Assessment, Long> {
-    Boolean existsByNameFile(String nameFile);
+    Boolean existsByFileName(String fileName);
 }

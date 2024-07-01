@@ -1,6 +1,7 @@
 package com.vmo.management_fresher.service;
 
 import com.vmo.management_fresher.constant.Constant;
+import com.vmo.management_fresher.dto.response.ResAssessment;
 import com.vmo.management_fresher.model.Assessment;
 import com.vmo.management_fresher.repository.AssessmentRepo;
 import com.vmo.management_fresher.repository.CenterRepo;
@@ -8,7 +9,9 @@ import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.io.IOException;
 
@@ -18,28 +21,28 @@ public class AssessmentService {
     private final AssessmentRepo repo;
     private final CenterRepo centerRepo;
 
-    public void storeFile(String uid, MultipartFile file, Integer typeAssessment, Long centerId){
-        String nameFile = file.getOriginalFilename();
+    public ResAssessment storeFile(String uid, MultipartFile file, Integer assessmentType, Long centerId){
+        String fileName = StringUtils.cleanPath(file.getOriginalFilename());
 
-        var exist = repo.existsByNameFile(nameFile);
+        var exist = repo.existsByFileName(fileName);
         if(exist){
             throw new EntityExistsException("name-file-existed");
         }
         Assessment assessment = new Assessment();
-        assessment.setNameFile(nameFile);
-        assessment.setTypeFile(file.getContentType());
+        assessment.setFileName(fileName);
+        assessment.setFileType(file.getContentType());
         try {
-            assessment.setContentFile(file.getBytes());
+            assessment.setFileContent(file.getBytes());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        if (typeAssessment != Constant.ASSESSMENT_OTHER &&
-                typeAssessment != Constant.ASSESSMENT_LEVEL_1 &&
-                typeAssessment != Constant.ASSESSMENT_LEVEL_2 &&
-                typeAssessment != Constant.ASSESSMENT_LEVEL_3) {
-            throw new IllegalArgumentException("invalid-type-assessment-value: " + typeAssessment);
+        if (assessmentType != Constant.ASSESSMENT_OTHER &&
+                assessmentType != Constant.ASSESSMENT_LEVEL_1 &&
+                assessmentType != Constant.ASSESSMENT_LEVEL_2 &&
+                assessmentType != Constant.ASSESSMENT_LEVEL_3) {
+            throw new IllegalArgumentException("invalid-type-assessment-value: " + assessmentType);
         }
-        assessment.setTypeAssessment(typeAssessment);
+        assessment.setAssessmentType(assessmentType);
         if(!centerRepo.existsById(centerId)){
             throw new IllegalArgumentException("center-exist-with-id: " + centerId);
         }
@@ -47,7 +50,17 @@ public class AssessmentService {
         assessment.setCreatedBy(uid);
         assessment.setUpdatedBy(uid);
 
-        repo.save(assessment);
+        String downloadURL = "";
+        assessment = repo.save(assessment);
+
+        downloadURL = ServletUriComponentsBuilder.fromCurrentContextPath()
+                .path("/assessment/download/")
+                .path(String.valueOf(assessment.getId())).toUriString();
+
+        return new ResAssessment(assessment.getFileName(),
+                downloadURL,
+                file.getContentType(),
+                file.getSize());
     }
 
     public void deleteFile(Long id){

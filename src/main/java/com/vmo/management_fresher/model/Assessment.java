@@ -15,11 +15,11 @@ public class Assessment extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String nameFile;
-    private String typeFile;
+    private String fileName;
+    private String fileType;
 
     @Lob
-    private byte[] contentFile;
-    private Integer typeAssessment;
+    private byte[] fileContent;
+    private Integer assessmentType;
     private Long centerId;
 }
