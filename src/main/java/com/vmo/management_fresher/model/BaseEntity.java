@@ -1,39 +1,36 @@
 package com.vmo.management_fresher.model;
 
 import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.PersistenceException;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
+import lombok.Data;
+import org.springframework.util.StringUtils;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @MappedSuperclass
-public abstract class BaseEntity {
+@Data
+public abstract class BaseEntity implements Serializable {
     private String createdBy;
     private String updatedBy;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    public String getCreatedBy() {
-        return createdBy;
+    @PrePersist
+    void setInitialDate() {
+        if(StringUtils.isEmpty(createdBy)){
+            throw new PersistenceException("create-by-cannot-be-null");
+        }
+        if(StringUtils.isEmpty(updatedBy)){
+            throw new PersistenceException("update-by-cannot-be-null");
+        }
+        createdAt = updatedAt = LocalDateTime.now();
     }
 
-    public void setCreatedBy(String createdBy) {
-        this.createdBy = createdBy;
-        this.createdAt = LocalDateTime.now();
-    }
-
-    public String getUpdatedBy() {
-        return updatedBy;
-    }
-
-    public void setUpdatedBy(String updatedBy) {
-        this.updatedBy = updatedBy;
-        this.updatedAt = LocalDateTime.now();
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
+    @PreUpdate
+    void updateDate() {
+        updatedAt = LocalDateTime.now();
     }
 }
