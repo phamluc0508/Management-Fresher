@@ -25,8 +25,6 @@ public class CenterApi {
             , description = "Create single Center"
             , tags = {"Center"}
     )
-    @Parameter(in = ParameterIn.HEADER, description = "Addition Key to bypass authen", name = "key"
-            , schema = @Schema(implementation = String.class))
     protected ResponseEntity createCenter(
             @RequestHeader String uid,
             @RequestBody Center request

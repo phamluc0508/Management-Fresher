@@ -25,7 +25,7 @@ public class AssessmentApi {
             @RequestParam("file") MultipartFile file,
             @RequestParam("assessmentType") Integer assessmentType,
             @RequestParam("centerId") Long centerId
-            ){
+    ){
         try{
             return ResponseUtils.handlerSuccess(service.storeFile(uid, file, assessmentType, centerId));
         }catch (Exception ex){
