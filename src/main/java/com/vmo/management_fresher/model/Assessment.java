@@ -17,6 +17,7 @@ public class Assessment extends BaseEntity{
     private Long id;
     private String fileName;
     private String fileType;
+    private Long fileSize;
 
     @Lob
     private byte[] fileContent;

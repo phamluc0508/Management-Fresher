@@ -9,8 +9,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ResAssessment {
 
+    private Long id;
     private String fileName;
     private String downloadURL;
     private String fileType;
     private Long fileSize;
+    private Integer assessmentType;
+    private Long centerId;
 }

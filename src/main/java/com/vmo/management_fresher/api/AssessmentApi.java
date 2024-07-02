@@ -56,6 +56,17 @@ public class AssessmentApi {
         }
     }
 
+    @GetMapping("/get-by-centerId/{centerId}")
+    protected ResponseEntity getAllByCenterId(
+            @PathVariable("centerId") Long centerId
+    ){
+        try {
+            return ResponseUtils.handlerSuccess(service.getAllByCenterId(centerId));
+        }catch (Exception ex){
+            return ResponseUtils.handlerException(ex);
+        }
+    }
+
     @GetMapping("/download/{id}")
     protected ResponseEntity downloadFile(
             @PathVariable("id") Long id

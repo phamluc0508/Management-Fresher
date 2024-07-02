@@ -14,6 +14,8 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +32,7 @@ public class AssessmentService {
         }
         Assessment assessment = new Assessment();
         assessment.setFileName(fileName);
+        assessment.setFileSize(file.getSize());
         assessment.setFileType(file.getContentType());
         try {
             assessment.setFileContent(file.getBytes());
@@ -57,10 +60,13 @@ public class AssessmentService {
                 .path("/assessment/download/")
                 .path(String.valueOf(assessment.getId())).toUriString();
 
-        return new ResAssessment(assessment.getFileName(),
+        return new ResAssessment(assessment.getId(),
+                assessment.getFileName(),
                 downloadURL,
                 file.getContentType(),
-                file.getSize());
+                file.getSize(),
+                assessmentType,
+                centerId);
     }
 
     public void deleteFile(Long id){
@@ -70,5 +76,16 @@ public class AssessmentService {
 
     public Assessment getById(Long id){
         return repo.findById(id).orElseThrow(() -> new EntityNotFoundException("not-found-with-id: " + id));
+    }
+
+    public List<ResAssessment> getAllByCenterId(Long centerId){
+        List<ResAssessment> result = repo.findAllByCenterId(centerId);
+        for(var r : result){
+            String downloadURL = ServletUriComponentsBuilder.fromCurrentContextPath()
+                    .path("/assessment/download/")
+                    .path(String.valueOf(r.getId())).toUriString();
+            r.setDownloadURL(downloadURL);
+        }
+        return result;
     }
 }
