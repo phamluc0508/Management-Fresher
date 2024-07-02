@@ -2,7 +2,6 @@ package com.vmo.management_fresher.service;
 
 import com.vmo.management_fresher.model.Role;
 import com.vmo.management_fresher.repository.RoleRepo;
-import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
