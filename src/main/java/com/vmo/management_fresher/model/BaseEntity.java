@@ -5,13 +5,19 @@ import jakarta.persistence.PersistenceException;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import org.springframework.util.StringUtils;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
-@MappedSuperclass
 @Data
+@NoArgsConstructor
+@MappedSuperclass
+@SuperBuilder
+@EqualsAndHashCode(callSuper = false)
 public abstract class BaseEntity implements Serializable {
     private String createdBy;
     private String updatedBy;

@@ -9,7 +9,7 @@ import java.util.Set;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ResAccount {
+public class AccountRes {
     private String id;
     private String username;
     private Set<String> roles;

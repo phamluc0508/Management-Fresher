@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ResAssessment {
+public class AssessmentRes {
 
     private Long id;
     private String fileName;

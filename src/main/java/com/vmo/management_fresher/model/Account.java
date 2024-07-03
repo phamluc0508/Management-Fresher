@@ -1,16 +1,17 @@
 package com.vmo.management_fresher.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.util.Set;
 
 @Entity
 @Data
-@NoArgsConstructor
+@SuperBuilder
 @AllArgsConstructor
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = false)
 public class Account extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

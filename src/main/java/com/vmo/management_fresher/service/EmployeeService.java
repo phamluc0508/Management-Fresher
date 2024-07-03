@@ -57,6 +57,7 @@ public class EmployeeService {
         request.setCreatedBy(uid);
         request.setUpdatedBy(uid);
 
+        //create Account for new Employee
         Account account = new Account();
         account.setUsername(request.getEmail());
         account.setPassword(passwordEncoder.encode("123456"));

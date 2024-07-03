@@ -15,7 +15,7 @@ public class RoleService {
 
     public void valid(Role request){
         if(request.getName() == null || request.getName().isEmpty()){
-            throw new RuntimeException("request-name-not-empty");
+            throw new RuntimeException("role-name-not-empty");
         }
     }
 
@@ -24,7 +24,7 @@ public class RoleService {
 
         var exist = repo.findById(request.getName());
         if(exist.isPresent()){
-            throw new RuntimeException("request-name-existed");
+            throw new RuntimeException("role-name-existed");
         }
         Role role = new Role();
         role.setName(request.getName());

@@ -1,16 +1,15 @@
 package com.vmo.management_fresher.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 @Entity
 @Data
-@NoArgsConstructor
+@SuperBuilder
 @AllArgsConstructor
-@Builder
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = false)
 public class Assessment extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

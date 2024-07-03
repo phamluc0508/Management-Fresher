@@ -1,7 +1,7 @@
 package com.vmo.management_fresher.service;
 
 import com.vmo.management_fresher.constant.Constant;
-import com.vmo.management_fresher.dto.response.ResAssessment;
+import com.vmo.management_fresher.dto.response.AssessmentRes;
 import com.vmo.management_fresher.model.Assessment;
 import com.vmo.management_fresher.repository.AssessmentRepo;
 import com.vmo.management_fresher.repository.CenterRepo;
@@ -22,7 +22,7 @@ public class AssessmentService {
     private final AssessmentRepo repo;
     private final CenterRepo centerRepo;
 
-    public ResAssessment storeFile(String uid, MultipartFile file, Integer assessmentType, Long centerId){
+    public AssessmentRes storeFile(String uid, MultipartFile file, Integer assessmentType, Long centerId){
         String fileName = StringUtils.cleanPath(file.getOriginalFilename());
 
         var exist = repo.existsByFileName(fileName);
@@ -59,7 +59,7 @@ public class AssessmentService {
                 .path("/assessment/download/")
                 .path(String.valueOf(assessment.getId())).toUriString();
 
-        return new ResAssessment(assessment.getId(),
+        return new AssessmentRes(assessment.getId(),
                 assessment.getFileName(),
                 downloadURL,
                 file.getContentType(),
@@ -77,8 +77,8 @@ public class AssessmentService {
         return repo.findById(id).orElseThrow(() -> new EntityNotFoundException("not-found-with-id: " + id));
     }
 
-    public List<ResAssessment> getAllByCenterId(Long centerId){
-        List<ResAssessment> result = repo.findAllByCenterId(centerId);
+    public List<AssessmentRes> getAllByCenterId(Long centerId){
+        List<AssessmentRes> result = repo.findAllByCenterId(centerId);
         for(var r : result){
             String downloadURL = ServletUriComponentsBuilder.fromCurrentContextPath()
                     .path("/assessment/download/")

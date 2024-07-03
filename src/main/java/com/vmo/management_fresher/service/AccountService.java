@@ -1,6 +1,6 @@
 package com.vmo.management_fresher.service;
 
-import com.vmo.management_fresher.dto.response.ResAccount;
+import com.vmo.management_fresher.dto.response.AccountRes;
 import com.vmo.management_fresher.model.Account;
 import com.vmo.management_fresher.model.Employee;
 import com.vmo.management_fresher.model.Role;
@@ -44,6 +44,7 @@ public class AccountService {
 
         repo.save(request);
 
+        //create Employee for new Account
         Employee employee = new Employee();
         employee.setAccountId(request.getId());
         employee.setCreatedBy(uid);
@@ -69,8 +70,8 @@ public class AccountService {
         return "Success!";
     }
 
-    public ResAccount getById(String id){
-        ResAccount result = new ResAccount();
+    public AccountRes getById(String id){
+        AccountRes result = new AccountRes();
         Account account = repo.findById(id).orElseThrow(() -> new EntityNotFoundException("Account-not-found-with-id: " + id));
         result.setId(id);
         result.setUsername(account.getUsername());
@@ -82,20 +83,20 @@ public class AccountService {
         return result;
     }
 
-    public List<ResAccount> getAll(){
-        List<ResAccount> result = new ArrayList<>();
+    public List<AccountRes> getAll(){
+        List<AccountRes> result = new ArrayList<>();
         List<Account> accounts = repo.findAll();
         for(Account account : accounts){
-            ResAccount resAccount = new ResAccount();
-            resAccount.setId(account.getId());
-            resAccount.setUsername(account.getUsername());
+            AccountRes accountRes = new AccountRes();
+            accountRes.setId(account.getId());
+            accountRes.setUsername(account.getUsername());
             Set<String> roles = new HashSet<>();
             for(Role role : account.getRoles()){
                 roles.add(role.getName());
             }
-            resAccount.setRoles(roles);
+            accountRes.setRoles(roles);
 
-            result.add(resAccount);
+            result.add(accountRes);
         }
         return result;
     }

@@ -1,7 +1,7 @@
 package com.vmo.management_fresher.api;
 
-import com.vmo.management_fresher.model.Role;
-import com.vmo.management_fresher.service.RoleService;
+import com.vmo.management_fresher.model.Position;
+import com.vmo.management_fresher.service.PositionService;
 import com.vmo.management_fresher.utility.ResponseUtils;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -9,32 +9,32 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/role")
+@RequestMapping("/position")
 @RequiredArgsConstructor
-@Tag(name = "Role", description = "Role API ")
-public class RoleApi {
-    private final RoleService service;
+@Tag(name = "Position", description = "Position API ")
+public class PositionApi {
+    private final PositionService service;
 
     @PostMapping()
-    protected ResponseEntity createRole(
+    protected ResponseEntity createPosition(
             @RequestHeader String uid,
-            @RequestBody Role request
+            @RequestBody Position request
     ){
         try {
-            return ResponseUtils.handlerSuccess(service.createRole(uid, request));
+            return ResponseUtils.handlerSuccess(service.createPosition(uid, request));
         }catch (Exception ex){
             return ResponseUtils.handlerException(ex);
         }
     }
 
     @PutMapping("/{name}")
-    protected ResponseEntity updateRole(
+    protected ResponseEntity updatePosition(
             @RequestHeader String uid,
             @PathVariable("name") String name,
-            @RequestBody Role request
+            @RequestBody Position request
     ){
         try {
-            return ResponseUtils.handlerSuccess(service.updateRole(uid, name, request));
+            return ResponseUtils.handlerSuccess(service.updatePosition(uid, name, request));
         }catch (Exception ex){
             return ResponseUtils.handlerException(ex);
         }
@@ -45,7 +45,7 @@ public class RoleApi {
             @PathVariable("name") String name
     ){
         try{
-            return ResponseUtils.handlerSuccess(service.deleteRole(name));
+            return ResponseUtils.handlerSuccess(service.deletePosition(name));
         } catch (Exception ex){
             return ResponseUtils.handlerException(ex);
         }

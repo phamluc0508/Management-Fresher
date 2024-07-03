@@ -2,12 +2,14 @@ package com.vmo.management_fresher.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 @Entity
 @Data
-@NoArgsConstructor
+@SuperBuilder
 @AllArgsConstructor
-@Builder
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = false)
 public class Center extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
