@@ -1,11 +1,9 @@
 package com.vmo.management_fresher.service;
 
-import com.vmo.management_fresher.constant.Constant;
 import com.vmo.management_fresher.dto.request.EmployeeReq;
 import com.vmo.management_fresher.dto.response.EmployeeRes;
 import com.vmo.management_fresher.model.Account;
 import com.vmo.management_fresher.model.Employee;
-import com.vmo.management_fresher.model.EmployeeCenter;
 import com.vmo.management_fresher.repository.AccountRepo;
 import com.vmo.management_fresher.repository.EmployeeCenterRepo;
 import com.vmo.management_fresher.repository.EmployeeRepo;

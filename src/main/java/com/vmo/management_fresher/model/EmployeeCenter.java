@@ -1,5 +1,6 @@
 package com.vmo.management_fresher.model;
 
+import com.vmo.management_fresher.base.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -13,7 +14,7 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class EmployeeCenter extends BaseEntity{
+public class EmployeeCenter extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

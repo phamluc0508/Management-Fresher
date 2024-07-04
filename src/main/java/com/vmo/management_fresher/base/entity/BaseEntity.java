@@ -1,4 +1,4 @@
-package com.vmo.management_fresher.model;
+package com.vmo.management_fresher.base.entity;
 
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.PersistenceException;

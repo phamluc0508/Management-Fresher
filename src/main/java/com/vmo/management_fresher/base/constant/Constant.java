@@ -1,4 +1,4 @@
-package com.vmo.management_fresher.constant;
+package com.vmo.management_fresher.base.constant;
 
 public class Constant {
     //Role

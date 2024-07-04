@@ -1,6 +1,6 @@
 package com.vmo.management_fresher.service;
 
-import com.vmo.management_fresher.constant.Constant;
+import com.vmo.management_fresher.base.constant.Constant;
 import com.vmo.management_fresher.dto.response.AssessmentRes;
 import com.vmo.management_fresher.model.Assessment;
 import com.vmo.management_fresher.repository.AssessmentRepo;

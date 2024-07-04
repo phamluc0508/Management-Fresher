@@ -1,14 +1,12 @@
 package com.vmo.management_fresher.configuration;
 
-import com.vmo.management_fresher.constant.Constant;
+import com.vmo.management_fresher.base.constant.Constant;
 import com.vmo.management_fresher.model.Account;
 import com.vmo.management_fresher.model.Role;
 import com.vmo.management_fresher.repository.AccountRepo;
 import com.vmo.management_fresher.repository.RoleRepo;
 import lombok.RequiredArgsConstructor;
-import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

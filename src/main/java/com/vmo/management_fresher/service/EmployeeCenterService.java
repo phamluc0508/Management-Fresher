@@ -1,6 +1,6 @@
 package com.vmo.management_fresher.service;
 
-import com.vmo.management_fresher.constant.Constant;
+import com.vmo.management_fresher.base.constant.Constant;
 import com.vmo.management_fresher.dto.request.EmployeeCenterReq;
 import com.vmo.management_fresher.model.Center;
 import com.vmo.management_fresher.model.Employee;
