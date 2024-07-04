@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/account")
 @RequiredArgsConstructor
@@ -46,6 +48,19 @@ public class AccountApi {
     ){
         try {
             return ResponseUtils.handlerSuccess(service.deleteAccount(id));
+        }catch (Exception ex){
+            return ResponseUtils.handlerException(ex);
+        }
+    }
+
+    @PatchMapping("/{id}/add-role-account")
+    protected ResponseEntity addRoleAccount(
+            @RequestHeader String uid,
+            @PathVariable("id") String id,
+            @RequestBody List<String> roles
+    ){
+        try {
+            return ResponseUtils.handlerSuccess(service.addRoleAccount(uid, id, roles));
         }catch (Exception ex){
             return ResponseUtils.handlerException(ex);
         }

@@ -1,5 +1,6 @@
 package com.vmo.management_fresher.service;
 
+import com.vmo.management_fresher.base.constant.Constant;
 import com.vmo.management_fresher.dto.response.AccountRes;
 import com.vmo.management_fresher.model.Account;
 import com.vmo.management_fresher.model.Employee;
@@ -7,6 +8,7 @@ import com.vmo.management_fresher.model.Role;
 import com.vmo.management_fresher.repository.AccountRepo;
 import com.vmo.management_fresher.repository.EmployeeCenterRepo;
 import com.vmo.management_fresher.repository.EmployeeRepo;
+import com.vmo.management_fresher.repository.RoleRepo;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +22,7 @@ import java.util.*;
 @RequiredArgsConstructor
 public class AccountService {
     private final AccountRepo repo;
+    private final RoleRepo roleRepo;
     private final EmployeeRepo employeeRepo;
     private final EmployeeCenterRepo employeeCenterRepo;
     private final PasswordEncoder passwordEncoder;
@@ -83,6 +86,28 @@ public class AccountService {
         repo.delete(account);
 
         return "Success!";
+    }
+
+    public Account addRoleAccount(String uid, String id, List<String> roles){
+        Account account = repo.findById(id).orElseThrow(() -> new EntityNotFoundException("Account-not-found-with-id: " + id));
+        if(account.getUsername().equals("admin")){
+            throw new RuntimeException("invalid-id: " + id);
+        }
+        Set<String> roleValid = new HashSet<>();
+        for(String r : roles){
+            if(r.equals(Constant.ADMIN_ROLE)){
+                throw new RuntimeException("role-cannot-be-admin");
+            } else if(!(r.equals(Constant.DIRECTOR_ROLE) || r.equals(Constant.FRESHER_ROLE))){
+                throw new RuntimeException("invalid-role-format");
+            }
+            roleValid.add(r);
+        }
+
+        List<Role> roleList = roleRepo.findAllById(roleValid);
+        account.setRoles(new HashSet<>(roleList));
+        account.setUpdatedBy(uid);
+
+        return repo.save(account);
     }
 
     public AccountRes getById(String id){
