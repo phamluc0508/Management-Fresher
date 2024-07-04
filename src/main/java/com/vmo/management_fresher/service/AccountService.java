@@ -5,6 +5,7 @@ import com.vmo.management_fresher.model.Account;
 import com.vmo.management_fresher.model.Employee;
 import com.vmo.management_fresher.model.Role;
 import com.vmo.management_fresher.repository.AccountRepo;
+import com.vmo.management_fresher.repository.EmployeeCenterRepo;
 import com.vmo.management_fresher.repository.EmployeeRepo;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
@@ -20,6 +21,7 @@ import java.util.*;
 public class AccountService {
     private final AccountRepo repo;
     private final EmployeeRepo employeeRepo;
+    private final EmployeeCenterRepo employeeCenterRepo;
     private final PasswordEncoder passwordEncoder;
 
     public void valid(Account request){
@@ -66,6 +68,19 @@ public class AccountService {
         account.setUpdatedBy(uid);
 
         repo.save(request);
+
+        return "Success!";
+    }
+
+    public String deleteAccount(String id){
+        Account account = repo.findById(id).orElseThrow(() -> new EntityNotFoundException("account-not-found-with-id: " + id));
+
+        Employee employee = employeeRepo.findByAccountId(id).orElseThrow(() -> new EntityNotFoundException("employee-not-found-with-accountId: " + id));
+        if(employeeCenterRepo.existsByEmployeeId(employee.getId())){
+            throw new EntityExistsException("employee-is-currently-in-the-center");
+        }
+        employeeRepo.delete(employee);
+        repo.delete(account);
 
         return "Success!";
     }

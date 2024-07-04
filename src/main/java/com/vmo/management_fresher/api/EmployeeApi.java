@@ -1,5 +1,6 @@
 package com.vmo.management_fresher.api;
 
+import com.vmo.management_fresher.dto.request.EmployeeReq;
 import com.vmo.management_fresher.model.Employee;
 import com.vmo.management_fresher.service.EmployeeService;
 import com.vmo.management_fresher.utility.ResponseUtils;
@@ -19,7 +20,7 @@ public class EmployeeApi {
     @PostMapping()
     protected ResponseEntity createEmployee(
             @RequestHeader String uid,
-            @RequestBody Employee request
+            @RequestBody EmployeeReq request
     ){
         try{
             return ResponseUtils.handlerSuccess(service.createEmployee(uid, request));
@@ -32,11 +33,22 @@ public class EmployeeApi {
     protected ResponseEntity updateEmployee(
             @RequestHeader String uid,
             @PathVariable("id") Long id,
-            @RequestBody Employee request
+            @RequestBody EmployeeReq request
     ){
         try{
             return ResponseUtils.handlerSuccess(service.updateEmployee(uid, id, request));
         }catch (Exception ex){
+            return ResponseUtils.handlerException(ex);
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    protected ResponseEntity deleteEmployee(
+        @PathVariable("id") Long id
+    ){
+        try{
+            return ResponseUtils.handlerSuccess(service.deleteEmployee(id));
+        } catch (Exception ex){
             return ResponseUtils.handlerException(ex);
         }
     }

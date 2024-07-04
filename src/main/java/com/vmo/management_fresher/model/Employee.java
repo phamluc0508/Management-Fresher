@@ -1,5 +1,7 @@
 package com.vmo.management_fresher.model;
 
+import com.vmo.management_fresher.dto.request.EmployeeReq;
+import com.vmo.management_fresher.dto.response.EmployeeRes;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -32,4 +34,31 @@ public class Employee extends BaseEntity{
     private String phoneNumber;
 
     private String accountId;
+
+    public static Employee of(String uid, EmployeeReq request){
+        return Employee.builder()
+                .id(request.getId())
+                .firstName(request.getFirstName())
+                .middleName(request.getMiddleName())
+                .lastName(request.getLastName())
+                .email(request.getEmail())
+                .phoneNumber(request.getPhoneNumber())
+                .createdBy(uid)
+                .updatedBy(uid)
+                .build();
+    }
+
+    public static EmployeeRes toRES(Employee request){
+        return EmployeeRes.builder()
+                .id(request.getId())
+                .firstName(request.getFirstName())
+                .middleName(request.getMiddleName())
+                .lastName(request.getLastName())
+                .email(request.getEmail())
+                .phoneNumber(request.getPhoneNumber())
+                .accountId(request.getAccountId())
+                .build();
+    }
+
+    public EmployeeRes toRES(){return toRES(this);};
 }

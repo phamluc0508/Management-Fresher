@@ -1,9 +1,13 @@
 package com.vmo.management_fresher.service;
 
+import com.vmo.management_fresher.dto.request.EmployeeReq;
+import com.vmo.management_fresher.dto.response.EmployeeRes;
 import com.vmo.management_fresher.model.Account;
 import com.vmo.management_fresher.model.Employee;
 import com.vmo.management_fresher.repository.AccountRepo;
+import com.vmo.management_fresher.repository.EmployeeCenterRepo;
 import com.vmo.management_fresher.repository.EmployeeRepo;
+import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
@@ -19,12 +23,13 @@ import java.util.regex.Pattern;
 public class EmployeeService {
     private final EmployeeRepo repo;
     private final AccountRepo accountRepo;
+    private final EmployeeCenterRepo employeeCenterRepo;
     private final PasswordEncoder passwordEncoder;
 
     private static final String EMAIL_REGEX = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$";
     private static final String PHONE_REGEX = "^0\\d{9}$";
 
-    public void valid(Employee request){
+    public void valid(EmployeeReq request){
         if(StringUtils.isEmpty(request.getFirstName())){
             throw new RuntimeException("first-name-cannot-be-null");
         }
@@ -46,7 +51,7 @@ public class EmployeeService {
         }
     }
 
-    public String createEmployee(String uid, Employee request){
+    public EmployeeRes createEmployee(String uid, EmployeeReq request){
         valid(request);
         if(repo.existsByEmail(request.getEmail())){
             throw new EntityNotFoundException("email-used");
@@ -54,8 +59,8 @@ public class EmployeeService {
         if(repo.existsByPhoneNumber(request.getPhoneNumber())){
             throw new EntityNotFoundException("phone-number-used");
         }
-        request.setCreatedBy(uid);
-        request.setUpdatedBy(uid);
+
+        Employee employee = Employee.of(uid, request);
 
         //create Account for new Employee
         Account account = new Account();
@@ -65,13 +70,16 @@ public class EmployeeService {
         account.setUpdatedBy(uid);
         accountRepo.save(account);
 
-        request.setAccountId(account.getId());
-        repo.save(request);
+        employee.setAccountId(account.getId());
+        repo.save(employee);
 
-        return "Success!";
+        EmployeeRes employeeRes = employee.toRES();
+        employeeRes.setUsername(account.getUsername());
+
+        return employeeRes;
     }
 
-    public Employee updateEmployee(String uid, Long id, Employee request){
+    public Employee updateEmployee(String uid, Long id, EmployeeReq request){
         valid(request);
         Employee employee = repo.findById(id).orElseThrow(() -> new EntityNotFoundException("employee-not-found-with-id: " + id));
         employee.setFirstName(request.getFirstName());
@@ -89,6 +97,17 @@ public class EmployeeService {
         employee.setUpdatedBy(uid);
 
         return repo.save(employee);
+    }
+
+    public String deleteEmployee(Long id){
+        if(employeeCenterRepo.existsByEmployeeId(id)){
+            throw new EntityExistsException("employee-is-currently-in-the-center");
+        }
+        Employee employee = repo.findById(id).orElseThrow(() -> new EntityNotFoundException("employee-not-found-with-id: " + id));
+        accountRepo.deleteById(employee.getAccountId());
+        repo.delete(employee);
+
+        return "Success!";
     }
 
     public Map<String, Object> getById(Long id){

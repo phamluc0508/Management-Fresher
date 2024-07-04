@@ -2,6 +2,7 @@ package com.vmo.management_fresher.service;
 
 import com.vmo.management_fresher.model.Center;
 import com.vmo.management_fresher.repository.CenterRepo;
+import com.vmo.management_fresher.repository.EmployeeCenterRepo;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CenterService {
     private final CenterRepo repo;
+    private final EmployeeCenterRepo employeeCenterRepo;
 
     private void valid(Center request){
         if(request.getName() == null || request.getName().isEmpty()){
@@ -61,9 +63,11 @@ public class CenterService {
 
     public String deleteCenter(Long id){
         Center center = repo.findById(id).orElseThrow(() -> new EntityNotFoundException("not-found-with-id"));
-        boolean exist = repo.existsByParentId(id);
-        if(exist){
+        if(repo.existsByParentId(id)){
             throw new EntityExistsException("center-is-parent");
+        }
+        if(employeeCenterRepo.existsByCenterId(id)){
+            throw new EntityExistsException("center-has-employees");
         }
         repo.delete(center);
         return "successfully delete center with id:" + id;

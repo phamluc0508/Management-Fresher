@@ -40,6 +40,17 @@ public class AccountApi {
         }
     }
 
+    @DeleteMapping("/{id}")
+    protected ResponseEntity deleteAccount(
+            @PathVariable("id") String id
+    ){
+        try {
+            return ResponseUtils.handlerSuccess(service.deleteAccount(id));
+        }catch (Exception ex){
+            return ResponseUtils.handlerException(ex);
+        }
+    }
+
     @GetMapping("/{id}")
     protected ResponseEntity getById(
             @PathVariable("id") String id

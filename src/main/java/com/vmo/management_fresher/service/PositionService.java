@@ -41,7 +41,6 @@ public class PositionService {
         Position position = repo.findById(name).orElseThrow(() -> new EntityNotFoundException("position-not-found-with-name: " + name));
         position.setName(request.getName());
         position.setDescription(request.getDescription());
-        position.setCreatedBy(uid);
         position.setUpdatedBy(uid);
 
         return repo.save(position);

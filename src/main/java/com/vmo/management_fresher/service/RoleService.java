@@ -41,7 +41,6 @@ public class RoleService {
         Role role = repo.findById(name).orElseThrow(() -> new EntityNotFoundException("role-not-found-with-name: " + name));
         role.setName(request.getName());
         role.setDescription(request.getDescription());
-        role.setCreatedBy(uid);
         role.setUpdatedBy(uid);
 
         return repo.save(role);
