@@ -1,9 +1,11 @@
 package com.vmo.management_fresher.service;
 
+import com.vmo.management_fresher.constant.Constant;
 import com.vmo.management_fresher.dto.request.EmployeeReq;
 import com.vmo.management_fresher.dto.response.EmployeeRes;
 import com.vmo.management_fresher.model.Account;
 import com.vmo.management_fresher.model.Employee;
+import com.vmo.management_fresher.model.EmployeeCenter;
 import com.vmo.management_fresher.repository.AccountRepo;
 import com.vmo.management_fresher.repository.EmployeeCenterRepo;
 import com.vmo.management_fresher.repository.EmployeeRepo;
@@ -14,6 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -111,7 +114,11 @@ public class EmployeeService {
     }
 
     public Map<String, Object> getById(Long id){
-        return repo.getEmployeeById(id).orElseThrow(() -> new EntityNotFoundException("employee-not-found-with-id: " + id));
+        var employee = repo.getEmployeeById(id).orElseThrow(() -> new EntityNotFoundException("employee-not-found-with-id: " + id));
+        List<Map<String, Object>> employeeCenter = employeeCenterRepo.getByEmployeeId(id);
+        Map<String, Object> result = new HashMap<>(employee);
+        result.put("position", employeeCenter);
+        return result;
     }
 
     public List<Map<String, Object>> getAll(){
