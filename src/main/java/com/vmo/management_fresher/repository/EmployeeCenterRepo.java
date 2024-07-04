@@ -14,6 +14,7 @@ public interface EmployeeCenterRepo extends JpaRepository<EmployeeCenter, Long> 
     Boolean existsByEmployeeId(Long employeeId);
     Boolean existsByEmployeeIdAndPositionName(Long employeeId, String positionName);
     Boolean existsByCenterId(Long centerId);
+    Boolean existsByCenterIdAndPositionName(Long employeeId, String positionName);
 
     @Query(value = "select ec.position.name as position" +
             " , c.name as centerName" +

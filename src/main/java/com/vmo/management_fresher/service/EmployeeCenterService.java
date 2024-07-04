@@ -47,6 +47,8 @@ public class EmployeeCenterService {
             }
         } else if(repo.existsByEmployeeIdAndPositionName(request.getEmployeeId(), Constant.FRESHER_POSITION)){
             throw new RuntimeException("employee-is-currently-fresher");
+        } else if(repo.existsByCenterIdAndPositionName(request.getCenterId(), Constant.DIRECTOR_POSITION)){
+            throw new RuntimeException("center-already-has-director");
         }
 
         Position position = positionRepo.findById(request.getPosition()).orElseThrow(() -> new EntityNotFoundException("position-not-found-with-name: " + request.getPosition()));
