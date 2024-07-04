@@ -1,13 +1,11 @@
 package com.vmo.management_fresher.api;
 
 import com.vmo.management_fresher.dto.request.EmployeeReq;
-import com.vmo.management_fresher.model.Employee;
 import com.vmo.management_fresher.service.EmployeeService;
 import com.vmo.management_fresher.utility.ResponseUtils;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 @RestController

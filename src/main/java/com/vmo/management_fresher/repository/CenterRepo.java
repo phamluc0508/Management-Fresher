@@ -12,9 +12,6 @@ import java.util.Optional;
 
 @Repository
 public interface CenterRepo extends JpaRepository<Center, Long> {
-    Optional<Center> findByName(String name);
-
-    Optional<Center> findByNameAndIdIsNot(String name, Long id);
 
     Boolean existsByParentId(Long id);
 

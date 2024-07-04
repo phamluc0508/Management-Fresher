@@ -41,6 +41,7 @@ public class EmployeeCenterService {
 
     public EmployeeCenter create(String uid, EmployeeCenterReq request){
         valid(request);
+        Position position = positionRepo.findById(request.getPosition()).orElseThrow(() -> new EntityNotFoundException("position-not-found-with-name: " + request.getPosition()));
         if(request.getPosition().equals(Constant.FRESHER_POSITION)){
             if(repo.existsByEmployeeId(request.getEmployeeId())){
                 throw new RuntimeException("employee-is-currently-in-the-center");
@@ -50,8 +51,6 @@ public class EmployeeCenterService {
         } else if(repo.existsByCenterIdAndPositionName(request.getCenterId(), Constant.DIRECTOR_POSITION)){
             throw new RuntimeException("center-already-has-director");
         }
-
-        Position position = positionRepo.findById(request.getPosition()).orElseThrow(() -> new EntityNotFoundException("position-not-found-with-name: " + request.getPosition()));
 
         EmployeeCenter employeeCenter = new EmployeeCenter();
         employeeCenter.setEmployeeId(request.getEmployeeId());
