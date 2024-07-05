@@ -1,6 +1,6 @@
 package com.vmo.management_fresher.api;
 
-import com.vmo.management_fresher.service.EmployeeService;
+import com.vmo.management_fresher.service.DashboardService;
 import com.vmo.management_fresher.utility.ResponseUtils;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -15,14 +15,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @Tag(name = "Dashboard", description = "Dashboard API ")
 public class DashboardApi {
-    private final EmployeeService employeeService;
+    private final DashboardService dashboardService;
 
     @GetMapping("/number-freshers-by-center")
     protected ResponseEntity numberFresherByCenter(
             @RequestParam Long centerId
     ){
         try {
-            return ResponseUtils.handlerSuccess(employeeService.numberFreshersCenter(centerId));
+            return ResponseUtils.handlerSuccess(dashboardService.numberFreshersCenter(centerId));
         }catch (Exception ex){
             return ResponseUtils.handlerException(ex);
         }
@@ -32,7 +32,7 @@ public class DashboardApi {
     protected ResponseEntity freshersByPoint(
     ){
         try {
-            return ResponseUtils.handlerSuccess(employeeService.findFreshersByPoint());
+            return ResponseUtils.handlerSuccess(dashboardService.findFreshersByPoint());
         }catch (Exception ex){
             return ResponseUtils.handlerException(ex);
         }
@@ -42,7 +42,7 @@ public class DashboardApi {
     protected ResponseEntity freshersByAVG(
     ){
         try {
-            return ResponseUtils.handlerSuccess(employeeService.findFreshersByAVG());
+            return ResponseUtils.handlerSuccess(dashboardService.findFreshersByAVG());
         }catch (Exception ex){
             return ResponseUtils.handlerException(ex);
         }
