@@ -52,4 +52,15 @@ public class AssessmentFresherApi {
             return ResponseUtils.handlerException(ex);
         }
     }
+
+    @GetMapping("/cal-average")
+    protected ResponseEntity calAverageFresher(
+            @RequestParam Long employeeId
+    ){
+        try{
+            return ResponseUtils.handlerSuccess(service.calAverageFresher(employeeId));
+        }catch (Exception ex){
+            return ResponseUtils.handlerException(ex);
+        }
+    }
 }

@@ -5,8 +5,10 @@ import com.vmo.management_fresher.service.EmployeeService;
 import com.vmo.management_fresher.utility.ResponseUtils;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 
 @RestController
 @RequestMapping("/employee")
@@ -66,6 +68,21 @@ public class EmployeeApi {
     protected ResponseEntity getAll(){
         try{
             return ResponseUtils.handlerSuccess(service.getAll());
+        }catch (Exception ex){
+            return ResponseUtils.handlerException(ex);
+        }
+    }
+
+    @GetMapping("/search")
+    protected ResponseEntity searchEmployee(
+            @RequestParam(value = "name", defaultValue = "#") String name,
+            @RequestParam(value = "email", defaultValue = "#") String email,
+            @RequestParam(value = "position", defaultValue = "#") String position,
+            @RequestParam(value = "programmingLanguage", defaultValue = "#") String programmingLanguage,
+            Pageable pageable
+    ){
+        try{
+            return ResponseUtils.handlerSuccess(service.searchEmployee(name, email, position, programmingLanguage, pageable));
         }catch (Exception ex){
             return ResponseUtils.handlerException(ex);
         }

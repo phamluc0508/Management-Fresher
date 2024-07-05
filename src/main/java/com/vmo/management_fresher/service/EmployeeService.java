@@ -1,5 +1,6 @@
 package com.vmo.management_fresher.service;
 
+import com.vmo.management_fresher.base.constant.Constant;
 import com.vmo.management_fresher.dto.request.EmployeeReq;
 import com.vmo.management_fresher.dto.response.EmployeeRes;
 import com.vmo.management_fresher.model.Account;
@@ -11,6 +12,8 @@ import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -122,4 +125,27 @@ public class EmployeeService {
     public List<Map<String, Object>> getAll(){
         return repo.getAll();
     }
+
+    public Page<Employee> searchEmployee(String name, String email, String position, String programingLanguage, Pageable pageable){
+        return repo.searchEmployee(name, email, position, programingLanguage, pageable);
+    }
+
+    public Map<String, Object> numberFreshersCenter(Long centerId){
+        List<Employee> employees = repo.findEmployeesInCenter(centerId, Constant.FRESHER_POSITION);
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("totalElements", employees.size());
+        result.put("employees", employees);
+
+        return result;
+    }
+
+    public List<Map<String, Object>> findFreshersByPoint(){
+        return repo.findEmployeesByPoint(Constant.FRESHER_POSITION);
+    }
+
+    public List<Map<String, Object>> findFreshersByAVG(){
+        return repo.findEmployeesByAVG(Constant.FRESHER_POSITION);
+    }
+
 }
