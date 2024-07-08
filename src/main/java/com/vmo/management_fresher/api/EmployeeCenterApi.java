@@ -27,6 +27,19 @@ public class EmployeeCenterApi {
         }
     }
 
+    @PutMapping("/{id}")
+    protected ResponseEntity create(
+            @RequestHeader String uid,
+            @PathVariable("id") Long id,
+            @RequestBody EmployeeCenterReq request
+    ){
+        try {
+            return ResponseUtils.handlerSuccess(service.moveEmployee(uid, id, request));
+        }catch (Exception ex){
+            return ResponseUtils.handlerException(ex);
+        }
+    }
+
     @DeleteMapping("/{id}")
     protected ResponseEntity delete(
             @PathVariable("id") Long id

@@ -93,4 +93,12 @@ public interface EmployeeRepo extends JpaRepository<Employee, Long> {
             " having count(distinct a.assessmentType) = 3" +
             " order by AVG(af.point)")
     List<Map<String, Object>> findEmployeesByAVG(@Param("position") String position);
+
+    @Query(value = "select e.email" +
+            " from Employee e" )
+    List<String> findAllEmails();
+
+    @Query(value = "select e.phoneNumber" +
+            " from Employee e" )
+    List<String> findAllPhoneNumbers();
 }

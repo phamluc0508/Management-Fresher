@@ -1,5 +1,7 @@
 package com.vmo.management_fresher.service.impl;
 
+import com.vmo.management_fresher.base.constant.Constant;
+import com.vmo.management_fresher.base.filter.Filter;
 import com.vmo.management_fresher.dto.request.EmployeeReq;
 import com.vmo.management_fresher.dto.response.EmployeeRes;
 import com.vmo.management_fresher.model.Account;
@@ -30,9 +32,6 @@ public class EmployeeServiceImpl implements EmployeeService {
     private final EmployeeCenterRepo employeeCenterRepo;
     private final PasswordEncoder passwordEncoder;
 
-    private static final String EMAIL_REGEX = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$";
-    private static final String PHONE_REGEX = "^0\\d{9}$";
-
     public void valid(EmployeeReq request){
         if(StringUtils.isEmpty(request.getFirstName())){
             throw new RuntimeException("first-name-cannot-be-null");
@@ -45,12 +44,12 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
         if(StringUtils.isEmpty(request.getEmail())){
             throw new RuntimeException("email-cannot-be-null");
-        } else if(!Pattern.matches(EMAIL_REGEX, request.getEmail())){
+        } else if(!Pattern.matches(Filter.EMAIL_REGEX, request.getEmail())){
             throw new RuntimeException("invalid-email-format");
         }
         if(StringUtils.isEmpty(request.getPhoneNumber())){
             throw new RuntimeException("phone-number-cannot-be-null");
-        } else if(!Pattern.matches(PHONE_REGEX, request.getPhoneNumber())){
+        } else if(!Pattern.matches(Filter.PHONE_REGEX, request.getPhoneNumber())){
             throw new RuntimeException("invalid-phone-format");
         }
     }
@@ -70,7 +69,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         //create Account for new Employee
         Account account = new Account();
         account.setUsername(request.getEmail());
-        account.setPassword(passwordEncoder.encode("123456"));
+        account.setPassword(passwordEncoder.encode(Constant.PASSWORD_DEFAULT));
         account.setCreatedBy(uid);
         account.setUpdatedBy(uid);
         accountRepo.save(account);

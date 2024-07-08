@@ -8,12 +8,16 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Repository
 public interface CenterRepo extends JpaRepository<Center, Long> {
 
     Boolean existsByParentId(Long id);
+
+    List<Center> findAllByParentIdIn(List<Long> parentIds);
 
     Boolean existsByName(String name);
 
@@ -25,5 +29,5 @@ public interface CenterRepo extends JpaRepository<Center, Long> {
     )
     Page<Center> search(@Param("search") String search, Pageable pageable);
 
-    Page<Center> findByNameContainingIgnoreCase(String name, Pageable pageable);
+//    Page<Center> findByNameContainingIgnoreCase(String name, Pageable pageable);
 }

@@ -65,9 +65,32 @@ public class EmployeeCenterServiceImpl implements EmployeeCenterService {
     }
 
     @Override
+    public EmployeeCenter moveEmployee(String uid, Long id, EmployeeCenterReq request){
+        valid(request);
+
+        Position position = positionRepo.findById(request.getPosition()).orElseThrow(() -> new EntityNotFoundException("position-not-found-with-name: " + request.getPosition()));
+        if(request.getPosition().equals(Constant.FRESHER_POSITION)){
+            if(repo.existsByEmployeeIdAndIdIsNot(request.getEmployeeId(), id)){
+                throw new RuntimeException("employee-cannot-be-fresher");
+            }
+        }
+
+        EmployeeCenter employeeCenter = repo.findById(id).orElseThrow(() -> new EntityNotFoundException("employee-center-not-found-with-id: " + id));
+
+        employeeCenter.setEmployeeId(request.getEmployeeId());
+        employeeCenter.setCenterId(request.getCenterId());
+        employeeCenter.setPosition(position);
+        employeeCenter.setUpdatedBy(uid);
+
+        return repo.save(employeeCenter);
+    }
+
+    @Override
     public String removeEmployeeFromCenter(Long id){
         EmployeeCenter employeeCenter = repo.findById(id).orElseThrow(() -> new EntityNotFoundException("employeeCenter-not-found-with-id: " + id));
         repo.delete(employeeCenter);
         return "Success!";
     }
+
+
 }

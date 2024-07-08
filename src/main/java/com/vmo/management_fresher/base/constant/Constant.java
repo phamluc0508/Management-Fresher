@@ -1,6 +1,9 @@
 package com.vmo.management_fresher.base.constant;
 
 public class Constant {
+    //Password Default
+    public static final String PASSWORD_DEFAULT = "123456";
+
     //Role
     public static final String OTHER_ROLE = "OTHER";
     public static final String ADMIN_ROLE = "ADMIN";

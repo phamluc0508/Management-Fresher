@@ -6,4 +6,5 @@ import com.vmo.management_fresher.model.EmployeeCenter;
 public interface EmployeeCenterService {
     EmployeeCenter create(String uid, EmployeeCenterReq request);
     String removeEmployeeFromCenter(Long id);
+    EmployeeCenter moveEmployee(String uid, Long id, EmployeeCenterReq request);
 }

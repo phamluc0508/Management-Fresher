@@ -1,6 +1,8 @@
 package com.vmo.management_fresher.service.impl;
 
+import com.vmo.management_fresher.dto.request.GroupCenterReq;
 import com.vmo.management_fresher.model.Center;
+import com.vmo.management_fresher.model.EmployeeCenter;
 import com.vmo.management_fresher.repository.CenterRepo;
 import com.vmo.management_fresher.repository.EmployeeCenterRepo;
 import com.vmo.management_fresher.service.CenterService;
@@ -90,5 +92,56 @@ public class CenterServiceImpl implements CenterService {
     @Override
     public Page<Center> search(String name, Pageable pageable){
         return repo.search(name, pageable);
+    }
+
+    @Override
+    public Center groupTwoCenter(String uid, GroupCenterReq request){
+        Center destinationCenter = null;
+
+        if(request.getSourceCenterIds().size() != 2){
+            throw new RuntimeException("num-of-source-center-is-two");
+        }
+
+        if(request.getDestinationCenterId() != null){
+            if(request.getNewCenter() != null){
+                throw new RuntimeException("exist-either-destination-center-or-new-center");
+            }else {
+                if(!request.getSourceCenterIds().remove(request.getDestinationCenterId())){
+                    throw new RuntimeException("destination-center-id-not-in-source-center-ids");
+                }
+                destinationCenter = repo.findById(request.getDestinationCenterId()).orElseThrow(() -> new EntityNotFoundException("center-not-found-with-id: " + request.getDestinationCenterId()));
+            }
+        }else {
+            if(request.getNewCenter() == null){
+                throw new RuntimeException("exist-either-destination-center-or-new-center");
+            }
+        }
+
+        List<Center> centerDelete = repo.findAllById(request.getSourceCenterIds());
+        if(centerDelete.size() != request.getSourceCenterIds().size()){
+            throw new EntityNotFoundException("center-not-found-with-source-center");
+        }
+
+        if(destinationCenter == null){
+            destinationCenter = createCenter(uid, request.getNewCenter());
+        }
+
+        List<Center> subCenters = repo.findAllByParentIdIn(request.getSourceCenterIds());
+        for(Center center : subCenters){
+            center.setParentId(null);
+            center.setUpdatedBy(uid);
+        }
+        repo.saveAll(subCenters);
+
+        List<EmployeeCenter> employeeCenters = employeeCenterRepo.findAllByCenterIdIn(request.getSourceCenterIds());
+        for(EmployeeCenter employeeCenter : employeeCenters){
+            employeeCenter.setCenterId(destinationCenter.getId());
+            employeeCenter.setUpdatedBy(uid);
+        }
+        employeeCenterRepo.saveAll(employeeCenters);
+
+        repo.deleteAll(centerDelete);
+
+        return destinationCenter;
     }
 }

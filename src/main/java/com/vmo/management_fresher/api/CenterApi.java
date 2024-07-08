@@ -1,5 +1,6 @@
 package com.vmo.management_fresher.api;
 
+import com.vmo.management_fresher.dto.request.GroupCenterReq;
 import com.vmo.management_fresher.model.Center;
 import com.vmo.management_fresher.service.CenterService;
 import com.vmo.management_fresher.utility.ResponseUtils;
@@ -105,6 +106,22 @@ public class CenterApi {
         try {
             return ResponseUtils.handlerSuccess(service.search(search, pageable));
         } catch (Exception ex){
+            return ResponseUtils.handlerException(ex);
+        }
+    }
+
+    @PostMapping("/group-two-center")
+    @Operation(summary = "Group two Center "
+            , description = "Group two Center "
+            , tags = { "Center"  }
+    )
+    protected ResponseEntity groupTwoCenter(
+            @RequestHeader String uid,
+            @RequestBody GroupCenterReq request
+    ){
+        try{
+            return ResponseUtils.handlerSuccess(service.groupTwoCenter(uid, request));
+        }catch (Exception ex){
             return ResponseUtils.handlerException(ex);
         }
     }

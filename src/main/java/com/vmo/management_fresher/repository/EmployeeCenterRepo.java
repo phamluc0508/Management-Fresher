@@ -12,8 +12,10 @@ import java.util.Map;
 @Repository
 public interface EmployeeCenterRepo extends JpaRepository<EmployeeCenter, Long> {
     Boolean existsByEmployeeId(Long employeeId);
+    Boolean existsByEmployeeIdAndIdIsNot(Long employeeId, Long id);
     Boolean existsByEmployeeIdAndPositionName(Long employeeId, String positionName);
     Boolean existsByCenterId(Long centerId);
+    List<EmployeeCenter> findAllByCenterIdIn(List<Long> centerIds);
     Boolean existsByCenterIdAndPositionName(Long centerId, String positionName);
     Boolean existsByEmployeeIdAndCenterIdAndPositionName(Long employeeId, Long centerId, String positionName);
 
