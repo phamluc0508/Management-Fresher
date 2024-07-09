@@ -1,7 +1,7 @@
 package com.vmo.management_fresher.service.impl;
 
 import com.vmo.management_fresher.base.constant.Constant;
-import com.vmo.management_fresher.base.filter.Filter;
+import com.vmo.management_fresher.base.validate.Validate;
 import com.vmo.management_fresher.model.*;
 import com.vmo.management_fresher.repository.*;
 import com.vmo.management_fresher.service.ImportService;
@@ -124,7 +124,7 @@ public class ImportServiceImpl implements ImportService {
                 if (emailCell == null || emailCell.getStringCellValue().trim().isEmpty()) {
                     error.append("email-cannot-be-empty; ");
                     hasError = true;
-                } else if(!Pattern.matches(Filter.EMAIL_REGEX, emailCell.getStringCellValue().trim())){
+                } else if(!Pattern.matches(Validate.EMAIL_REGEX, emailCell.getStringCellValue().trim())){
                     error.append("invalid-email-format; ");
                     hasError = true;
                 } else {
@@ -140,7 +140,7 @@ public class ImportServiceImpl implements ImportService {
                 if (phoneNumberCell == null || phoneNumberCell.getStringCellValue().trim().isEmpty()) {
                     error.append("phone-number-cannot-be-empty; ");
                     hasError = true;
-                } else if(!Pattern.matches(Filter.PHONE_REGEX, phoneNumberCell.getStringCellValue().trim())){
+                } else if(!Pattern.matches(Validate.PHONE_REGEX, phoneNumberCell.getStringCellValue().trim())){
                     error.append("invalid-phone-format; ");
                     hasError = true;
                 } else {

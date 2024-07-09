@@ -1,7 +1,7 @@
 package com.vmo.management_fresher.service.impl;
 
 import com.vmo.management_fresher.base.constant.Constant;
-import com.vmo.management_fresher.base.filter.Filter;
+import com.vmo.management_fresher.base.validate.Validate;
 import com.vmo.management_fresher.dto.request.EmployeeReq;
 import com.vmo.management_fresher.dto.response.EmployeeRes;
 import com.vmo.management_fresher.model.Account;
@@ -44,12 +44,12 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
         if(StringUtils.isEmpty(request.getEmail())){
             throw new RuntimeException("email-cannot-be-null");
-        } else if(!Pattern.matches(Filter.EMAIL_REGEX, request.getEmail())){
+        } else if(!Pattern.matches(Validate.EMAIL_REGEX, request.getEmail())){
             throw new RuntimeException("invalid-email-format");
         }
         if(StringUtils.isEmpty(request.getPhoneNumber())){
             throw new RuntimeException("phone-number-cannot-be-null");
-        } else if(!Pattern.matches(Filter.PHONE_REGEX, request.getPhoneNumber())){
+        } else if(!Pattern.matches(Validate.PHONE_REGEX, request.getPhoneNumber())){
             throw new RuntimeException("invalid-phone-format");
         }
     }
