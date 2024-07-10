@@ -34,13 +34,11 @@ public class ApplicationInitConfig {
                                 .updatedBy("admin")
                         .build();
                 roleRepo.save(adminRole);
-                HashSet<Role> roles = new HashSet<>();
-                roles.add(adminRole);
 
                 accountRepo.save(Account.builder()
                                 .username("admin")
                                 .password(passwordEncoder.encode("admin"))
-                                .roles(roles)
+                                .role(adminRole)
                                 .createdBy("admin")
                                 .updatedBy("admin")
                         .build());

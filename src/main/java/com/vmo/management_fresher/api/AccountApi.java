@@ -1,6 +1,6 @@
 package com.vmo.management_fresher.api;
 
-import com.vmo.management_fresher.model.Account;
+import com.vmo.management_fresher.dto.request.AuthenticationReq;
 import com.vmo.management_fresher.service.AccountService;
 import com.vmo.management_fresher.utility.ResponseUtils;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -20,7 +20,7 @@ public class AccountApi {
 
     @PostMapping("/registration")
     protected ResponseEntity createAccount(
-            @RequestBody Account request
+            @RequestBody AuthenticationReq request
     ){
         try{
             var context = SecurityContextHolder.getContext();
@@ -35,7 +35,7 @@ public class AccountApi {
     @PutMapping("/{id}")
     protected ResponseEntity updateAccount(
             @PathVariable("id") String id,
-            @RequestBody Account request
+            @RequestBody AuthenticationReq request
     ){
         try{
             var context = SecurityContextHolder.getContext();
@@ -64,13 +64,13 @@ public class AccountApi {
     @PatchMapping("/{id}/add-role-account")
     protected ResponseEntity addRoleAccount(
             @PathVariable("id") String id,
-            @RequestBody List<String> roles
+            @RequestBody String role
     ){
         try {
             var context = SecurityContextHolder.getContext();
             String uid = context.getAuthentication().getName();
 
-            return ResponseUtils.handlerSuccess(service.addRoleAccount(uid, id, roles));
+            return ResponseUtils.handlerSuccess(service.addRoleAccount(uid, id, role));
         }catch (Exception ex){
             return ResponseUtils.handlerException(ex);
         }

@@ -17,6 +17,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.text.ParseException;
 import java.time.Instant;
@@ -75,16 +76,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     private String buildScope(Account account){
         StringJoiner stringJoiner = new StringJoiner(" ");
-        if(!CollectionUtils.isEmpty(account.getRoles())){
-            account.getRoles().forEach(role -> {
-                stringJoiner.add("ROLE_" + role.getName());
-//                if(!CollectionUtils.isEmpty(role.getPermissions())){
-//                    role.getPermissions().forEach(permission -> {
-//                        stringJoiner.add(permission.getName());
-//                    });
-//                }
-
-            });
+        if(!StringUtils.isEmpty(account.getRole())){
+            stringJoiner.add("ROLE_" + account.getRole().getName());
         }
         return stringJoiner.toString();
     }

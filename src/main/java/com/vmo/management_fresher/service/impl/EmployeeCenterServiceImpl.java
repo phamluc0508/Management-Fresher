@@ -10,11 +10,15 @@ import com.vmo.management_fresher.repository.CenterRepo;
 import com.vmo.management_fresher.repository.EmployeeCenterRepo;
 import com.vmo.management_fresher.repository.EmployeeRepo;
 import com.vmo.management_fresher.repository.PositionRepo;
+import com.vmo.management_fresher.service.AccountService;
 import com.vmo.management_fresher.service.EmployeeCenterService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -23,6 +27,7 @@ public class EmployeeCenterServiceImpl implements EmployeeCenterService {
     private final EmployeeRepo employeeRepo;
     private final CenterRepo centerRepo;
     private final PositionRepo positionRepo;
+    private final AccountService accountService;
 
     private void valid(EmployeeCenterReq request){
         if(request.getEmployeeId() == null){
@@ -40,6 +45,15 @@ public class EmployeeCenterServiceImpl implements EmployeeCenterService {
         }
     }
 
+    private void updateRoleOfAccount(String uid, Long employeeId, String position){
+        Employee employee = employeeRepo.findById(employeeId).orElseThrow(() -> new EntityNotFoundException("employee-not-found-with-id: " + employeeId));
+        if(position.equals(Constant.FRESHER_POSITION)){
+            accountService.addRoleAccount(uid, employee.getAccountId(), Constant.FRESHER_ROLE);
+        }else if(position.equals(Constant.DIRECTOR_POSITION)){
+            accountService.addRoleAccount(uid, employee.getAccountId(), Constant.DIRECTOR_ROLE);
+        }
+    }
+
     @Override
     public EmployeeCenter create(String uid, EmployeeCenterReq request){
         valid(request);
@@ -50,8 +64,6 @@ public class EmployeeCenterServiceImpl implements EmployeeCenterService {
             }
         } else if(repo.existsByEmployeeIdAndPositionName(request.getEmployeeId(), Constant.FRESHER_POSITION)){
             throw new RuntimeException("employee-is-currently-fresher");
-        } else if(repo.existsByCenterIdAndPositionName(request.getCenterId(), Constant.DIRECTOR_POSITION)){
-            throw new RuntimeException("center-already-has-director");
         }
 
         EmployeeCenter employeeCenter = new EmployeeCenter();
@@ -61,7 +73,11 @@ public class EmployeeCenterServiceImpl implements EmployeeCenterService {
         employeeCenter.setCreatedBy(uid);
         employeeCenter.setUpdatedBy(uid);
 
-        return repo.save(employeeCenter);
+        employeeCenter = repo.save(employeeCenter);
+
+        updateRoleOfAccount(uid, request.getEmployeeId(), request.getPosition());
+
+        return employeeCenter;
     }
 
     @Override

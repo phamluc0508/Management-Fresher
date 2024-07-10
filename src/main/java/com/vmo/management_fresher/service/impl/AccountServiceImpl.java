@@ -1,6 +1,7 @@
 package com.vmo.management_fresher.service.impl;
 
 import com.vmo.management_fresher.base.constant.Constant;
+import com.vmo.management_fresher.dto.request.AuthenticationReq;
 import com.vmo.management_fresher.dto.response.AccountRes;
 import com.vmo.management_fresher.model.Account;
 import com.vmo.management_fresher.model.Employee;
@@ -28,7 +29,7 @@ public class AccountServiceImpl implements AccountService {
     private final EmployeeCenterRepo employeeCenterRepo;
     private final PasswordEncoder passwordEncoder;
 
-    private void valid(Account request){
+    private void valid(AuthenticationReq request){
         if(StringUtils.isEmpty(request.getUsername())){
             throw new RuntimeException("username-cannot-be-null");
         }
@@ -38,22 +39,24 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public String createAccount(String uid, Account request){
+    public String createAccount(String uid, AuthenticationReq request){
         valid(request);
 
         var exist = repo.existsByUsername(request.getUsername());
         if(exist){
             throw new EntityExistsException("username-existed");
         }
-        request.setPassword(passwordEncoder.encode(request.getPassword()));
-        request.setCreatedBy(uid);
-        request.setUpdatedBy(uid);
+        Account account = new Account();
+        account.setUsername(request.getUsername());
+        account.setPassword(passwordEncoder.encode(request.getPassword()));
+        account.setCreatedBy(uid);
+        account.setUpdatedBy(uid);
 
-        repo.save(request);
+        repo.save(account);
 
         //create Employee for new Account
         Employee employee = new Employee();
-        employee.setAccountId(request.getId());
+        employee.setAccountId(account.getId());
         employee.setCreatedBy(uid);
         employee.setUpdatedBy(uid);
         employeeRepo.save(employee);
@@ -62,7 +65,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public String updateAccount(String uid, String id, Account request){
+    public String updateAccount(String uid, String id, AuthenticationReq request){
         valid(request);
         var exist = repo.existsByUsernameAndIdIsNot(request.getUsername(), id);
         if(exist){
@@ -73,7 +76,7 @@ public class AccountServiceImpl implements AccountService {
         account.setPassword(passwordEncoder.encode(request.getPassword()));
         account.setUpdatedBy(uid);
 
-        repo.save(request);
+        repo.save(account);
 
         return "Success!";
     }
@@ -93,23 +96,19 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public Account addRoleAccount(String uid, String id, List<String> roles){
+    public Account addRoleAccount(String uid, String id, String roleName){
         Account account = repo.findById(id).orElseThrow(() -> new EntityNotFoundException("Account-not-found-with-id: " + id));
         if(account.getUsername().equals("admin")){
             throw new RuntimeException("invalid-id: " + id);
         }
-        Set<String> roleValid = new HashSet<>();
-        for(String r : roles){
-            if(r.equals(Constant.ADMIN_ROLE)){
-                throw new RuntimeException("role-cannot-be-admin");
-            } else if(!(r.equals(Constant.DIRECTOR_ROLE) || r.equals(Constant.FRESHER_ROLE))){
-                throw new RuntimeException("invalid-role-format");
-            }
-            roleValid.add(r);
+        if(roleName.equals(Constant.ADMIN_ROLE)){
+            throw new RuntimeException("role-cannot-be-admin");
+        } else if(!(roleName.equals(Constant.DIRECTOR_ROLE) || roleName.equals(Constant.FRESHER_ROLE))){
+            throw new RuntimeException("invalid-role-format");
         }
 
-        List<Role> roleList = roleRepo.findAllById(roleValid);
-        account.setRoles(new HashSet<>(roleList));
+        Role role = roleRepo.findById(roleName).orElseThrow(() -> new EntityNotFoundException("role-not-found"));
+        account.setRole(role);
         account.setUpdatedBy(uid);
 
         return repo.save(account);
@@ -121,11 +120,8 @@ public class AccountServiceImpl implements AccountService {
         Account account = repo.findById(id).orElseThrow(() -> new EntityNotFoundException("Account-not-found-with-id: " + id));
         result.setId(id);
         result.setUsername(account.getUsername());
-        Set<String> roles = new HashSet<>();
-        for(Role role : account.getRoles()){
-            roles.add(role.getName());
-        }
-        result.setRoles(roles);
+        String role = account.getRole().getName();
+        result.setRole(role);
         return result;
     }
 
@@ -137,11 +133,8 @@ public class AccountServiceImpl implements AccountService {
             AccountRes accountRes = new AccountRes();
             accountRes.setId(account.getId());
             accountRes.setUsername(account.getUsername());
-            Set<String> roles = new HashSet<>();
-            for(Role role : account.getRoles()){
-                roles.add(role.getName());
-            }
-            accountRes.setRoles(roles);
+            String role = account.getRole().getName();
+            accountRes.setRole(role);
 
             result.add(accountRes);
         }

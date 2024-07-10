@@ -12,5 +12,5 @@ import java.util.Set;
 public class AccountRes {
     private String id;
     private String username;
-    private Set<String> roles;
+    private String role;
 }

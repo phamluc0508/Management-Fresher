@@ -21,6 +21,6 @@ public class Account extends BaseEntity {
     private String username;
     private String password;
 
-    @ManyToMany
-    Set<Role> roles;
+    @ManyToOne
+    private Role role;
 }
