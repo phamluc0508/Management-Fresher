@@ -6,6 +6,7 @@ import com.vmo.management_fresher.utility.ResponseUtils;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -17,10 +18,12 @@ public class EmployeeCenterApi {
 
     @PostMapping()
     protected ResponseEntity create(
-            @RequestHeader String uid,
             @RequestBody EmployeeCenterReq request
     ){
         try {
+            var context = SecurityContextHolder.getContext();
+            String uid = context.getAuthentication().getName();
+
             return ResponseUtils.handlerSuccess(service.create(uid, request));
         }catch (Exception ex){
             return ResponseUtils.handlerException(ex);
@@ -29,11 +32,13 @@ public class EmployeeCenterApi {
 
     @PutMapping("/{id}")
     protected ResponseEntity create(
-            @RequestHeader String uid,
             @PathVariable("id") Long id,
             @RequestBody EmployeeCenterReq request
     ){
         try {
+            var context = SecurityContextHolder.getContext();
+            String uid = context.getAuthentication().getName();
+
             return ResponseUtils.handlerSuccess(service.moveEmployee(uid, id, request));
         }catch (Exception ex){
             return ResponseUtils.handlerException(ex);
@@ -45,6 +50,9 @@ public class EmployeeCenterApi {
             @PathVariable("id") Long id
     ){
         try {
+            var context = SecurityContextHolder.getContext();
+            String uid = context.getAuthentication().getName();
+
             return ResponseUtils.handlerSuccess(service.removeEmployeeFromCenter(id));
         }catch (Exception ex){
             return ResponseUtils.handlerException(ex);

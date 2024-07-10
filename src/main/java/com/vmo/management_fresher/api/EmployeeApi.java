@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -19,10 +20,12 @@ public class EmployeeApi {
 
     @PostMapping()
     protected ResponseEntity createEmployee(
-            @RequestHeader String uid,
             @RequestBody EmployeeReq request
     ){
         try{
+            var context = SecurityContextHolder.getContext();
+            String uid = context.getAuthentication().getName();
+
             return ResponseUtils.handlerSuccess(service.createEmployee(uid, request));
         }catch (Exception ex){
             return ResponseUtils.handlerException(ex);
@@ -31,11 +34,13 @@ public class EmployeeApi {
 
     @PutMapping("/{id}")
     protected ResponseEntity updateEmployee(
-            @RequestHeader String uid,
             @PathVariable("id") Long id,
             @RequestBody EmployeeReq request
     ){
         try{
+            var context = SecurityContextHolder.getContext();
+            String uid = context.getAuthentication().getName();
+
             return ResponseUtils.handlerSuccess(service.updateEmployee(uid, id, request));
         }catch (Exception ex){
             return ResponseUtils.handlerException(ex);
@@ -47,6 +52,9 @@ public class EmployeeApi {
         @PathVariable("id") Long id
     ){
         try{
+            var context = SecurityContextHolder.getContext();
+            String uid = context.getAuthentication().getName();
+
             return ResponseUtils.handlerSuccess(service.deleteEmployee(id));
         } catch (Exception ex){
             return ResponseUtils.handlerException(ex);
@@ -58,6 +66,9 @@ public class EmployeeApi {
             @PathVariable("id") Long id
     ){
         try{
+            var context = SecurityContextHolder.getContext();
+            String uid = context.getAuthentication().getName();
+
             return ResponseUtils.handlerSuccess(service.getById(id));
         }catch (Exception ex){
             return ResponseUtils.handlerException(ex);
@@ -67,6 +78,9 @@ public class EmployeeApi {
     @GetMapping("/get-all")
     protected ResponseEntity getAll(){
         try{
+            var context = SecurityContextHolder.getContext();
+            String uid = context.getAuthentication().getName();
+
             return ResponseUtils.handlerSuccess(service.getAll());
         }catch (Exception ex){
             return ResponseUtils.handlerException(ex);
@@ -82,6 +96,9 @@ public class EmployeeApi {
             Pageable pageable
     ){
         try{
+            var context = SecurityContextHolder.getContext();
+            String uid = context.getAuthentication().getName();
+
             return ResponseUtils.handlerSuccess(service.searchEmployee(name, email, position, programmingLanguage, pageable));
         }catch (Exception ex){
             return ResponseUtils.handlerException(ex);

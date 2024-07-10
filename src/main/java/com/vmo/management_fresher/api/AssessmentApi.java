@@ -9,6 +9,7 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,12 +22,14 @@ public class AssessmentApi {
 
     @PostMapping("/upload-file")
     protected ResponseEntity storeFile(
-            @RequestHeader String uid,
             @RequestParam("file") MultipartFile file,
             @RequestParam("assessmentType") Integer assessmentType,
             @RequestParam("centerId") Long centerId
     ){
         try{
+            var context = SecurityContextHolder.getContext();
+            String uid = context.getAuthentication().getName();
+
             return ResponseUtils.handlerSuccess(service.storeFile(uid, file, assessmentType, centerId));
         }catch (Exception ex){
             return ResponseUtils.handlerException(ex);
@@ -38,6 +41,9 @@ public class AssessmentApi {
             @PathVariable("id") Long id
     ){
         try{
+            var context = SecurityContextHolder.getContext();
+            String uid = context.getAuthentication().getName();
+
             service.deleteFile(id);
             return ResponseUtils.handlerSuccess();
         }catch (Exception ex){
@@ -50,6 +56,9 @@ public class AssessmentApi {
             @PathVariable("id") Long id
     ){
         try {
+            var context = SecurityContextHolder.getContext();
+            String uid = context.getAuthentication().getName();
+
             return ResponseUtils.handlerSuccess(service.getById(id));
         }catch (Exception ex){
             return ResponseUtils.handlerException(ex);
@@ -61,6 +70,9 @@ public class AssessmentApi {
             @PathVariable("centerId") Long centerId
     ){
         try {
+            var context = SecurityContextHolder.getContext();
+            String uid = context.getAuthentication().getName();
+
             return ResponseUtils.handlerSuccess(service.getAllByCenterId(centerId));
         }catch (Exception ex){
             return ResponseUtils.handlerException(ex);
@@ -72,6 +84,9 @@ public class AssessmentApi {
             @PathVariable("id") Long id
     ){
         try{
+            var context = SecurityContextHolder.getContext();
+            String uid = context.getAuthentication().getName();
+
             Assessment assessment = service.getById(id);
             return ResponseEntity.ok()
                     .contentType(MediaType.parseMediaType(assessment.getFileType()))

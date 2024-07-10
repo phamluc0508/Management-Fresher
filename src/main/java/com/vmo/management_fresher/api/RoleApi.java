@@ -6,6 +6,7 @@ import com.vmo.management_fresher.utility.ResponseUtils;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -17,10 +18,12 @@ public class RoleApi {
 
     @PostMapping()
     protected ResponseEntity createRole(
-            @RequestHeader String uid,
             @RequestBody Role request
     ){
         try {
+            var context = SecurityContextHolder.getContext();
+            String uid = context.getAuthentication().getName();
+
             return ResponseUtils.handlerSuccess(service.createRole(uid, request));
         }catch (Exception ex){
             return ResponseUtils.handlerException(ex);
@@ -29,11 +32,13 @@ public class RoleApi {
 
     @PutMapping("/{name}")
     protected ResponseEntity updateRole(
-            @RequestHeader String uid,
             @PathVariable("name") String name,
             @RequestBody Role request
     ){
         try {
+            var context = SecurityContextHolder.getContext();
+            String uid = context.getAuthentication().getName();
+
             return ResponseUtils.handlerSuccess(service.updateRole(uid, name, request));
         }catch (Exception ex){
             return ResponseUtils.handlerException(ex);
@@ -45,6 +50,9 @@ public class RoleApi {
             @PathVariable("name") String name
     ){
         try{
+            var context = SecurityContextHolder.getContext();
+            String uid = context.getAuthentication().getName();
+
             return ResponseUtils.handlerSuccess(service.deleteRole(name));
         } catch (Exception ex){
             return ResponseUtils.handlerException(ex);
@@ -56,6 +64,9 @@ public class RoleApi {
             @PathVariable("name") String name
     ){
         try{
+            var context = SecurityContextHolder.getContext();
+            String uid = context.getAuthentication().getName();
+
             return ResponseUtils.handlerSuccess(service.getById(name));
         }catch (Exception ex){
             return ResponseUtils.handlerException(ex);
@@ -65,6 +76,9 @@ public class RoleApi {
     @GetMapping("/get-all")
     protected ResponseEntity getAll(){
         try {
+            var context = SecurityContextHolder.getContext();
+            String uid = context.getAuthentication().getName();
+
             return ResponseUtils.handlerSuccess(service.getAll());
         } catch (Exception ex){
             return ResponseUtils.handlerException(ex);

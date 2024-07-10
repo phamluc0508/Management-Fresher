@@ -6,6 +6,7 @@ import com.vmo.management_fresher.utility.ResponseUtils;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -17,11 +18,13 @@ public class AssessmentFresherApi {
 
     @PostMapping("/add-assessment-fresher")
     protected ResponseEntity addAssessmentFresher(
-            @RequestHeader String uid,
             @RequestParam Long employeeId,
             @RequestParam Long assessmentId
     ){
         try{
+            var context = SecurityContextHolder.getContext();
+            String uid = context.getAuthentication().getName();
+
             return ResponseUtils.handlerSuccess(service.addAssessmentFresher(uid, employeeId, assessmentId));
         }catch (Exception ex){
             return ResponseUtils.handlerException(ex);
@@ -30,11 +33,13 @@ public class AssessmentFresherApi {
 
     @PatchMapping("/{id}/update-point-language")
     protected ResponseEntity updatePointLanguage(
-            @RequestHeader String uid,
             @PathVariable("id") Long id,
             @RequestBody PointProgrammingLanguageReq request
     ){
         try{
+            var context = SecurityContextHolder.getContext();
+            String uid = context.getAuthentication().getName();
+
             return ResponseUtils.handlerSuccess(service.updatePointAndProgrammingLanguage(uid, id, request));
         }catch (Exception ex){
             return ResponseUtils.handlerException(ex);
@@ -47,6 +52,9 @@ public class AssessmentFresherApi {
             @RequestParam(value = "allow", defaultValue = "false") Boolean allow
     ){
         try {
+            var context = SecurityContextHolder.getContext();
+            String uid = context.getAuthentication().getName();
+
             return ResponseUtils.handlerSuccess(service.deleteAssessmentFresher(id, allow));
         }catch (Exception ex){
             return ResponseUtils.handlerException(ex);
@@ -58,6 +66,9 @@ public class AssessmentFresherApi {
             @RequestParam Long employeeId
     ){
         try{
+            var context = SecurityContextHolder.getContext();
+            String uid = context.getAuthentication().getName();
+
             return ResponseUtils.handlerSuccess(service.calAverageFresher(employeeId));
         }catch (Exception ex){
             return ResponseUtils.handlerException(ex);

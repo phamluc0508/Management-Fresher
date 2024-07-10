@@ -6,6 +6,7 @@ import com.vmo.management_fresher.utility.ResponseUtils;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -20,6 +21,9 @@ public class AuthenticationApi {
             @RequestBody AuthenticationReq request
     ){
         try{
+            var context = SecurityContextHolder.getContext();
+            String uid = context.getAuthentication().getName();
+
             return ResponseUtils.handlerSuccess(service.login(request));
         }catch (Exception ex){
             return ResponseUtils.handlerException(ex);
@@ -31,6 +35,9 @@ public class AuthenticationApi {
             @RequestParam String token
     ){
         try {
+            var context = SecurityContextHolder.getContext();
+            String uid = context.getAuthentication().getName();
+
             return ResponseUtils.handlerSuccess(service.introspect(token));
         } catch (Exception ex){
             return ResponseUtils.handlerException(ex);

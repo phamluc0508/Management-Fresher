@@ -3,6 +3,7 @@ package com.vmo.management_fresher.service.impl;
 import com.vmo.management_fresher.base.constant.Constant;
 import com.vmo.management_fresher.dto.response.AssessmentRes;
 import com.vmo.management_fresher.model.Assessment;
+import com.vmo.management_fresher.repository.AssessmentFresherRepo;
 import com.vmo.management_fresher.repository.AssessmentRepo;
 import com.vmo.management_fresher.repository.CenterRepo;
 import com.vmo.management_fresher.service.AssessmentService;
@@ -22,6 +23,7 @@ import java.util.List;
 public class AssessmentServiceImpl implements AssessmentService {
     private final AssessmentRepo repo;
     private final CenterRepo centerRepo;
+    private final AssessmentFresherRepo assessmentFresherRepo;
 
     @Override
     public AssessmentRes storeFile(String uid, MultipartFile file, Integer assessmentType, Long centerId){
@@ -73,6 +75,9 @@ public class AssessmentServiceImpl implements AssessmentService {
     @Override
     public String deleteFile(Long id){
         Assessment assessment = repo.findById(id).orElseThrow(() -> new EntityNotFoundException("not-found-with-id: " + id));
+        if(assessmentFresherRepo.existsByAssessmentId(id)){
+            throw new EntityExistsException("assessment-assign-fresher");
+        }
         repo.delete(assessment);
 
         return "Success";

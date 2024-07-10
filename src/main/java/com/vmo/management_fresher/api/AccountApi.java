@@ -6,6 +6,7 @@ import com.vmo.management_fresher.utility.ResponseUtils;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,10 +20,12 @@ public class AccountApi {
 
     @PostMapping("/registration")
     protected ResponseEntity createAccount(
-            @RequestHeader String uid,
             @RequestBody Account request
     ){
         try{
+            var context = SecurityContextHolder.getContext();
+            String uid = context.getAuthentication().getName();
+
             return ResponseUtils.handlerSuccess(service.createAccount(uid, request));
         }catch (Exception ex){
             return ResponseUtils.handlerException(ex);
@@ -31,11 +34,13 @@ public class AccountApi {
 
     @PutMapping("/{id}")
     protected ResponseEntity updateAccount(
-            @RequestHeader String uid,
             @PathVariable("id") String id,
             @RequestBody Account request
     ){
         try{
+            var context = SecurityContextHolder.getContext();
+            String uid = context.getAuthentication().getName();
+
             return ResponseUtils.handlerSuccess(service.updateAccount(uid, id, request));
         }catch (Exception ex){
             return ResponseUtils.handlerException(ex);
@@ -47,6 +52,9 @@ public class AccountApi {
             @PathVariable("id") String id
     ){
         try {
+            var context = SecurityContextHolder.getContext();
+            String uid = context.getAuthentication().getName();
+
             return ResponseUtils.handlerSuccess(service.deleteAccount(id));
         }catch (Exception ex){
             return ResponseUtils.handlerException(ex);
@@ -55,11 +63,13 @@ public class AccountApi {
 
     @PatchMapping("/{id}/add-role-account")
     protected ResponseEntity addRoleAccount(
-            @RequestHeader String uid,
             @PathVariable("id") String id,
             @RequestBody List<String> roles
     ){
         try {
+            var context = SecurityContextHolder.getContext();
+            String uid = context.getAuthentication().getName();
+
             return ResponseUtils.handlerSuccess(service.addRoleAccount(uid, id, roles));
         }catch (Exception ex){
             return ResponseUtils.handlerException(ex);
@@ -71,6 +81,9 @@ public class AccountApi {
             @PathVariable("id") String id
     ){
         try {
+            var context = SecurityContextHolder.getContext();
+            String uid = context.getAuthentication().getName();
+
             return ResponseUtils.handlerSuccess(service.getById(id));
         }catch (Exception ex){
             return ResponseUtils.handlerException(ex);
@@ -80,6 +93,9 @@ public class AccountApi {
     @GetMapping("/get-all")
     protected ResponseEntity getAll(){
         try{
+            var context = SecurityContextHolder.getContext();
+            String uid = context.getAuthentication().getName();
+
             return ResponseUtils.handlerSuccess(service.getAll());
         }catch (Exception ex){
             return ResponseUtils.handlerException(ex);

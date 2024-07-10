@@ -12,6 +12,8 @@ import java.util.Map;
 @Repository
 public interface AssessmentFresherRepo extends JpaRepository<AssessmentFresher, Long> {
 
+    Boolean existsByAssessmentId(Long assessmentId);
+
     @Query(value = "select a.assessmentType" +
             " from AssessmentFresher af" +
             " inner join Assessment a on a.id = af.assessmentId" +

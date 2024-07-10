@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -23,10 +24,12 @@ public class ImportApi {
 
     @PostMapping("/fresher-to-center")
     protected ResponseEntity importFresherToCenter(
-            @RequestHeader String uid,
             @RequestParam("file") MultipartFile file
     ){
         try{
+            var context = SecurityContextHolder.getContext();
+            String uid = context.getAuthentication().getName();
+
             Map<String, Object> errorFile = service.importFresherToCenter(uid, file);
             if(errorFile == null){
                 return ResponseUtils.handlerSuccess("Success");
@@ -43,6 +46,9 @@ public class ImportApi {
             @PathVariable String fileName
     ){
         try{
+            var context = SecurityContextHolder.getContext();
+            String uid = context.getAuthentication().getName();
+
             File file = new File(System.getProperty("java.io.tmpdir") + "/" + fileName);
             byte[] fileContent = new FileInputStream(file).readAllBytes();
 
