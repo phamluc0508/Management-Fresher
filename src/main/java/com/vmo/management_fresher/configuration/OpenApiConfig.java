@@ -36,7 +36,7 @@ import io.swagger.v3.oas.annotations.servers.Server;
                 )
         },
         security = @SecurityRequirement(
-                name = "auth"
+                name = "authBearer"
         )
 )
 @SecurityScheme(

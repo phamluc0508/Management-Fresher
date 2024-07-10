@@ -13,6 +13,7 @@ import com.vmo.management_fresher.service.AuthenticationService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -28,13 +29,14 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class AuthenticationServiceImpl implements AuthenticationService {
     private final AccountRepo accountRepo;
-    private final PasswordEncoder passwordEncoder;
 
     @Value("${jwt.signer.key}")
     private String SIGNER_KEY;
 
     @Override
     public AuthenticationRes login(AuthenticationReq request){
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
+
         Account account = accountRepo.findByUsername(request.getUsername()).orElseThrow(() -> new EntityNotFoundException("not-found-with-username: " + request.getUsername()));
         if(!passwordEncoder.matches(request.getPassword(), account.getPassword())){
             throw new RuntimeException("wrong-password");
