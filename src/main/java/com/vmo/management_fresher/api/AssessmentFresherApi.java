@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 public class AssessmentFresherApi {
     private final AssessmentFresherService service;
 
-    @PostMapping("/add-assessment-fresher")
+    @PostMapping("/assessment-assign-fresher")
     protected ResponseEntity addAssessmentFresher(
             @RequestParam Long employeeId,
             @RequestParam Long assessmentId
@@ -55,7 +55,7 @@ public class AssessmentFresherApi {
             var context = SecurityContextHolder.getContext();
             String uid = context.getAuthentication().getName();
 
-            return ResponseUtils.handlerSuccess(service.deleteAssessmentFresher(id, allow));
+            return ResponseUtils.handlerSuccess(service.deleteAssessmentFresher(uid, id, allow));
         }catch (Exception ex){
             return ResponseUtils.handlerException(ex);
         }
@@ -69,7 +69,7 @@ public class AssessmentFresherApi {
             var context = SecurityContextHolder.getContext();
             String uid = context.getAuthentication().getName();
 
-            return ResponseUtils.handlerSuccess(service.calAverageFresher(employeeId));
+            return ResponseUtils.handlerSuccess(service.calAverageFresher(uid, employeeId));
         }catch (Exception ex){
             return ResponseUtils.handlerException(ex);
         }

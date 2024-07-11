@@ -26,7 +26,7 @@ public class DashboardApi {
             var context = SecurityContextHolder.getContext();
             String uid = context.getAuthentication().getName();
 
-            return ResponseUtils.handlerSuccess(dashboardService.numberFreshersCenter(centerId));
+            return ResponseUtils.handlerSuccess(dashboardService.numberFreshersCenter(uid, centerId));
         }catch (Exception ex){
             return ResponseUtils.handlerException(ex);
         }
@@ -39,7 +39,7 @@ public class DashboardApi {
             var context = SecurityContextHolder.getContext();
             String uid = context.getAuthentication().getName();
 
-            return ResponseUtils.handlerSuccess(dashboardService.findFreshersByPoint());
+            return ResponseUtils.handlerSuccess(dashboardService.findFreshersByPoint(uid));
         }catch (Exception ex){
             return ResponseUtils.handlerException(ex);
         }
@@ -52,7 +52,7 @@ public class DashboardApi {
             var context = SecurityContextHolder.getContext();
             String uid = context.getAuthentication().getName();
 
-            return ResponseUtils.handlerSuccess(dashboardService.findFreshersByAVG());
+            return ResponseUtils.handlerSuccess(dashboardService.findFreshersByAVG(uid));
         }catch (Exception ex){
             return ResponseUtils.handlerException(ex);
         }

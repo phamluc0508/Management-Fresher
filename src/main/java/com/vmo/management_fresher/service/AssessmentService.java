@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface AssessmentService {
     AssessmentRes storeFile(String uid, MultipartFile file, Integer assessmentType, Long centerId);
-    String deleteFile(Long id);
-    Assessment getById(Long id);
-    List<AssessmentRes> getAllByCenterId(Long centerId);
+    String deleteFile(String uid, Long id);
+    Assessment getById(String uid, Long id);
+    List<AssessmentRes> getAllByCenterId(String uid, Long centerId);
 }

@@ -5,12 +5,14 @@ import com.vmo.management_fresher.model.Center;
 import com.vmo.management_fresher.model.EmployeeCenter;
 import com.vmo.management_fresher.repository.CenterRepo;
 import com.vmo.management_fresher.repository.EmployeeCenterRepo;
+import com.vmo.management_fresher.service.AuthenticationService;
 import com.vmo.management_fresher.service.CenterService;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,6 +22,7 @@ import java.util.List;
 public class CenterServiceImpl implements CenterService {
     private final CenterRepo repo;
     private final EmployeeCenterRepo employeeCenterRepo;
+    private final AuthenticationService authenticationService;
 
     private void valid(Center request){
         if(request.getName() == null || request.getName().isEmpty()){
@@ -85,8 +88,14 @@ public class CenterServiceImpl implements CenterService {
     }
 
     @Override
-    public Center getById(Long id){
-        return repo.findById(id).orElseThrow(() -> new EntityNotFoundException("not-found-with-id"));
+    public Center getById(String uid, Long id){
+        Center center = repo.findById(id).orElseThrow(() -> new EntityNotFoundException("not-found-with-id"));
+
+        if(!authenticationService.checkAdminRole(uid) && !authenticationService.checkEmployeeCenter(uid, id)){
+            throw new AccessDeniedException("no-permission");
+        }
+
+        return center;
     }
 
     @Override

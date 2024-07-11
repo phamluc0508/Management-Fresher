@@ -4,6 +4,7 @@ import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 
 public class ResponseUtils {
     public static <T> ResponseEntity<ApiResponse<T>> handlerSuccess(T data) {
@@ -29,6 +30,8 @@ public class ResponseUtils {
             httpStatus = HttpStatus.CONFLICT;
         } else if (ex instanceof RuntimeException) {
             httpStatus = HttpStatus.BAD_REQUEST;
+        } else if (ex instanceof AccessDeniedException){
+            httpStatus = HttpStatus.FORBIDDEN;
         } else {
             httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
         }

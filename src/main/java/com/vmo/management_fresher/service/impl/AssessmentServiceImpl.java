@@ -3,13 +3,16 @@ package com.vmo.management_fresher.service.impl;
 import com.vmo.management_fresher.base.constant.Constant;
 import com.vmo.management_fresher.dto.response.AssessmentRes;
 import com.vmo.management_fresher.model.Assessment;
+import com.vmo.management_fresher.model.AssessmentFresher;
 import com.vmo.management_fresher.repository.AssessmentFresherRepo;
 import com.vmo.management_fresher.repository.AssessmentRepo;
 import com.vmo.management_fresher.repository.CenterRepo;
 import com.vmo.management_fresher.service.AssessmentService;
+import com.vmo.management_fresher.service.AuthenticationService;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,9 +27,13 @@ public class AssessmentServiceImpl implements AssessmentService {
     private final AssessmentRepo repo;
     private final CenterRepo centerRepo;
     private final AssessmentFresherRepo assessmentFresherRepo;
+    private final AuthenticationService authenticationService;
 
     @Override
     public AssessmentRes storeFile(String uid, MultipartFile file, Integer assessmentType, Long centerId){
+        if(!authenticationService.checkAdminRole(uid) && !authenticationService.checkDirectorCenter(uid, centerId)){
+            throw new AccessDeniedException("no-permission");
+        }
         String fileName = StringUtils.cleanPath(file.getOriginalFilename());
 
         var exist = repo.existsByFileName(fileName);
@@ -73,8 +80,13 @@ public class AssessmentServiceImpl implements AssessmentService {
     }
 
     @Override
-    public String deleteFile(Long id){
+    public String deleteFile(String uid, Long id){
         Assessment assessment = repo.findById(id).orElseThrow(() -> new EntityNotFoundException("not-found-with-id: " + id));
+
+        if(!authenticationService.checkAdminRole(uid) && !authenticationService.checkDirectorCenter(uid, assessment.getCenterId())){
+            throw new AccessDeniedException("no-permission");
+        }
+
         if(assessmentFresherRepo.existsByAssessmentId(id)){
             throw new EntityExistsException("assessment-assign-fresher");
         }
@@ -84,12 +96,22 @@ public class AssessmentServiceImpl implements AssessmentService {
     }
 
     @Override
-    public Assessment getById(Long id){
-        return repo.findById(id).orElseThrow(() -> new EntityNotFoundException("not-found-with-id: " + id));
+    public Assessment getById(String uid, Long id){
+        Assessment assessment = repo.findById(id).orElseThrow(() -> new EntityNotFoundException("not-found-with-id: " + id));
+        AssessmentFresher assessmentFresher = assessmentFresherRepo.findByAssessmentId(id).orElseThrow(() -> new EntityNotFoundException("assessment-fresher-not-found"));
+        if(!authenticationService.checkAdminRole(uid)
+                && !authenticationService.checkDirectorCenter(uid, assessment.getCenterId())
+                && !authenticationService.checkIsMyself(uid, assessmentFresher.getEmployeeId())){
+            throw new AccessDeniedException("no-permission");
+        }
+        return assessment;
     }
 
     @Override
-    public List<AssessmentRes> getAllByCenterId(Long centerId){
+    public List<AssessmentRes> getAllByCenterId(String uid, Long centerId){
+        if(!authenticationService.checkAdminRole(uid) && !authenticationService.checkDirectorCenter(uid, centerId)){
+            throw new AccessDeniedException("no-permission");
+        }
         List<AssessmentRes> result = repo.findAllByCenterId(centerId);
         for(var r : result){
             String downloadURL = ServletUriComponentsBuilder.fromCurrentContextPath()

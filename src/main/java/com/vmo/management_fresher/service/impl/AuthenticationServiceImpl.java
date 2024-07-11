@@ -5,11 +5,17 @@ import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
+import com.vmo.management_fresher.base.constant.Constant;
 import com.vmo.management_fresher.dto.request.AuthenticationReq;
 import com.vmo.management_fresher.dto.response.AuthenticationRes;
 import com.vmo.management_fresher.model.Account;
+import com.vmo.management_fresher.model.Employee;
+import com.vmo.management_fresher.model.EmployeeCenter;
 import com.vmo.management_fresher.repository.AccountRepo;
+import com.vmo.management_fresher.repository.EmployeeCenterRepo;
+import com.vmo.management_fresher.repository.EmployeeRepo;
 import com.vmo.management_fresher.service.AuthenticationService;
+import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,6 +29,7 @@ import java.text.ParseException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.List;
 import java.util.StringJoiner;
 import java.util.UUID;
 
@@ -30,6 +37,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class AuthenticationServiceImpl implements AuthenticationService {
     private final AccountRepo accountRepo;
+    private final EmployeeCenterRepo employeeCenterRepo;
+    private final EmployeeRepo employeeRepo;
 
     @Value("${jwt.signer.key}")
     private String SIGNER_KEY;
@@ -111,4 +120,74 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         return true;
     }
 
+    @Override
+    public Boolean checkAdminRole(String uid){
+        Account account = accountRepo.findById(uid).orElseThrow(() -> new EntityNotFoundException("account-not-found-with-id: " + uid));
+        if(account.getRole().getName().equals(Constant.ADMIN_ROLE)){
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public Boolean checkDirectorRole(String uid){
+        Account account = accountRepo.findById(uid).orElseThrow(() -> new EntityNotFoundException("account-not-found-with-id: " + uid));
+        if(account.getRole().getName().equals(Constant.DIRECTOR_ROLE)){
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public Boolean checkFresherRole(String uid){
+        Account account = accountRepo.findById(uid).orElseThrow(() -> new EntityNotFoundException("account-not-found-with-id: " + uid));
+        if(account.getRole().getName().equals(Constant.FRESHER_ROLE)){
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public Boolean checkIsMyself(String uid, Long employeeId) {
+        Employee employee = employeeRepo.findById(employeeId).orElseThrow(() -> new EntityNotFoundException("employee-not-found"));
+        if(employee.getAccountId().equals(uid)){
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public Boolean checkDirectorFresher(String directorAccId, Long fresherId){
+        EmployeeCenter fresherCenter = employeeCenterRepo.findByEmployeeIdAndPositionName(fresherId, Constant.FRESHER_POSITION)
+                .orElseThrow(() -> new EntityNotFoundException("fresher-not-exist-or-stays-in-more-than-1-center"));
+
+        Employee director = employeeRepo.findByAccountId(directorAccId).orElseThrow(() -> new EntityNotFoundException("account-not-found"));
+        List<EmployeeCenter> employeeCenters = employeeCenterRepo.findAllByEmployeeIdAndPositionName(director.getId(), Constant.DIRECTOR_POSITION);
+        for(EmployeeCenter employeeCenter : employeeCenters){
+            if(employeeCenter.getCenterId() == fresherCenter.getCenterId()){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public Boolean checkDirectorCenter(String directorAccId, Long centerId) {
+        Employee director = employeeRepo.findByAccountId(directorAccId).orElseThrow(() -> new EntityNotFoundException("account-not-found"));
+        var directorCenter = employeeCenterRepo.findByEmployeeIdAndCenterIdAndPositionName(director.getId(), centerId, Constant.DIRECTOR_POSITION);
+        if(directorCenter.isPresent()){
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public Boolean checkEmployeeCenter(String employeeAccId, Long centerId) {
+        Employee employee = employeeRepo.findByAccountId(employeeAccId).orElseThrow(() -> new EntityNotFoundException("account-not-found"));
+        var employeeCenter = employeeCenterRepo.findByEmployeeIdAndCenterId(employee.getId(), centerId);
+        if(employeeCenter.isPresent()){
+            return true;
+        }
+        return false;
+    }
 }

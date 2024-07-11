@@ -69,7 +69,7 @@ public class EmployeeApi {
             var context = SecurityContextHolder.getContext();
             String uid = context.getAuthentication().getName();
 
-            return ResponseUtils.handlerSuccess(service.getById(id));
+            return ResponseUtils.handlerSuccess(service.getById(uid, id));
         }catch (Exception ex){
             return ResponseUtils.handlerException(ex);
         }
@@ -99,7 +99,7 @@ public class EmployeeApi {
             var context = SecurityContextHolder.getContext();
             String uid = context.getAuthentication().getName();
 
-            return ResponseUtils.handlerSuccess(service.searchEmployee(name, email, position, programmingLanguage, pageable));
+            return ResponseUtils.handlerSuccess(service.searchEmployee(uid, name, email, position, programmingLanguage, pageable));
         }catch (Exception ex){
             return ResponseUtils.handlerException(ex);
         }

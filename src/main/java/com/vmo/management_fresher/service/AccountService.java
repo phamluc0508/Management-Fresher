@@ -11,6 +11,6 @@ public interface AccountService {
     String updateAccount(String uid, String id, AuthenticationReq request);
     String deleteAccount(String id);
     Account addRoleAccount(String uid, String id, String role);
-    AccountRes getById(String id);
+    AccountRes getById(String uid, String id);
     List<AccountRes> getAll();
 }

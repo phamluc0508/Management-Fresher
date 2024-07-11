@@ -11,14 +11,13 @@ import com.vmo.management_fresher.repository.EmployeeCenterRepo;
 import com.vmo.management_fresher.repository.EmployeeRepo;
 import com.vmo.management_fresher.repository.PositionRepo;
 import com.vmo.management_fresher.service.AccountService;
+import com.vmo.management_fresher.service.AuthenticationService;
 import com.vmo.management_fresher.service.EmployeeCenterService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +27,7 @@ public class EmployeeCenterServiceImpl implements EmployeeCenterService {
     private final CenterRepo centerRepo;
     private final PositionRepo positionRepo;
     private final AccountService accountService;
+    private final AuthenticationService authenticationService;
 
     private void valid(EmployeeCenterReq request){
         if(request.getEmployeeId() == null){
@@ -102,8 +102,13 @@ public class EmployeeCenterServiceImpl implements EmployeeCenterService {
     }
 
     @Override
-    public String removeEmployeeFromCenter(Long id){
+    public String removeEmployeeFromCenter(String uid, Long id){
         EmployeeCenter employeeCenter = repo.findById(id).orElseThrow(() -> new EntityNotFoundException("employeeCenter-not-found-with-id: " + id));
+
+        if(!authenticationService.checkAdminRole(uid) && !authenticationService.checkDirectorFresher(uid, employeeCenter.getEmployeeId())){
+            throw new AccessDeniedException("no-permission");
+        }
+
         repo.delete(employeeCenter);
         return "Success!";
     }

@@ -11,10 +11,12 @@ import com.vmo.management_fresher.repository.EmployeeCenterRepo;
 import com.vmo.management_fresher.repository.EmployeeRepo;
 import com.vmo.management_fresher.repository.RoleRepo;
 import com.vmo.management_fresher.service.AccountService;
+import com.vmo.management_fresher.service.AuthenticationService;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +29,7 @@ public class AccountServiceImpl implements AccountService {
     private final RoleRepo roleRepo;
     private final EmployeeRepo employeeRepo;
     private final EmployeeCenterRepo employeeCenterRepo;
+    private final AuthenticationService authenticationService;
     private final PasswordEncoder passwordEncoder;
 
     private void valid(AuthenticationReq request){
@@ -66,6 +69,9 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public String updateAccount(String uid, String id, AuthenticationReq request){
+        if(!authenticationService.checkAdminRole(uid) && !uid.equals(id)){
+            throw new AccessDeniedException("no-permission");
+        }
         valid(request);
         var exist = repo.existsByUsernameAndIdIsNot(request.getUsername(), id);
         if(exist){
@@ -115,7 +121,11 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public AccountRes getById(String id){
+    public AccountRes getById(String uid, String id){
+        if(!authenticationService.checkAdminRole(uid) && !uid.equals(id)){
+            throw new AccessDeniedException("no-permission");
+        }
+
         AccountRes result = new AccountRes();
         Account account = repo.findById(id).orElseThrow(() -> new EntityNotFoundException("Account-not-found-with-id: " + id));
         result.setId(id);

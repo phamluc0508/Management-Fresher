@@ -7,9 +7,11 @@ import com.vmo.management_fresher.model.AssessmentFresher;
 import com.vmo.management_fresher.model.ProgrammingLanguage;
 import com.vmo.management_fresher.repository.*;
 import com.vmo.management_fresher.service.AssessmentFresherService;
+import com.vmo.management_fresher.service.AuthenticationService;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -24,6 +26,7 @@ public class AssessmentFresherServiceImpl implements AssessmentFresherService {
     private final EmployeeCenterRepo employeeCenterRepo;
     private final AssessmentRepo assessmentRepo;
     private final ProgrammingLanguageRepo programmingLanguageRepo;
+    private final AuthenticationService authenticationService;
 
     @Override
     public AssessmentFresher addAssessmentFresher(String uid, Long employeeId, Long assessmentId){
@@ -31,6 +34,12 @@ public class AssessmentFresherServiceImpl implements AssessmentFresherService {
 
         if(!employeeCenterRepo.existsByEmployeeIdAndCenterIdAndPositionName(employeeId, assessment.getCenterId(), Constant.FRESHER_POSITION)){
             throw new EntityExistsException("employee-is-not-fresher-in-the-center");
+        }
+
+        if(!authenticationService.checkAdminRole(uid)
+                && !authenticationService.checkDirectorCenter(uid, assessment.getCenterId())
+                && !authenticationService.checkDirectorFresher(uid, employeeId)){
+            throw new AccessDeniedException("no-permission");
         }
 
         List<Integer> assessmentTypes = repo.getAssessmentTypeByEmployeeId(employeeId);
@@ -52,6 +61,12 @@ public class AssessmentFresherServiceImpl implements AssessmentFresherService {
     @Override
     public AssessmentFresher updatePointAndProgrammingLanguage(String uid, Long id, PointProgrammingLanguageReq request){
         AssessmentFresher assessmentFresher = repo.findById(id).orElseThrow(() -> new EntityNotFoundException("assessment-fresher-not-found-with-id: " + id));
+
+        if(!authenticationService.checkAdminRole(uid)
+                && !authenticationService.checkDirectorFresher(uid, assessmentFresher.getEmployeeId())){
+            throw new AccessDeniedException("no-permission");
+        }
+
         if(request.getPoint() != null){
             assessmentFresher.setPoint(request.getPoint());
         }
@@ -68,8 +83,14 @@ public class AssessmentFresherServiceImpl implements AssessmentFresherService {
     }
 
     @Override
-    public String deleteAssessmentFresher(Long id, Boolean allow){
+    public String deleteAssessmentFresher(String uid, Long id, Boolean allow){
         AssessmentFresher assessmentFresher = repo.findById(id).orElseThrow(() -> new EntityNotFoundException("assessment-fresher-not-found-with-id: " + id));
+
+        if(!authenticationService.checkAdminRole(uid)
+                && !authenticationService.checkDirectorFresher(uid, assessmentFresher.getEmployeeId())){
+            throw new AccessDeniedException("no-permission");
+        }
+
         if(assessmentFresher.getPoint() != null && !allow){
             throw new RuntimeException("assessment-fresher-cannot-delete");
         }
@@ -78,7 +99,13 @@ public class AssessmentFresherServiceImpl implements AssessmentFresherService {
     }
 
     @Override
-    public Map<String,Object> calAverageFresher(Long employeeId){
+    public Map<String,Object> calAverageFresher(String uid, Long employeeId){
+
+        if(!authenticationService.checkAdminRole(uid)
+                && !authenticationService.checkDirectorFresher(uid, employeeId)
+                && !authenticationService.checkIsMyself(uid, employeeId)){
+            throw new AccessDeniedException("no-permission");
+        }
 
         Double point1 = 0.0, point2 = 0.0, point3 = 0.0, average = 0.0;
 

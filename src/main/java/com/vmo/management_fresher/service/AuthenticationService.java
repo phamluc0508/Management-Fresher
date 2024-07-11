@@ -6,4 +6,11 @@ import com.vmo.management_fresher.dto.response.AuthenticationRes;
 public interface AuthenticationService {
     AuthenticationRes login(AuthenticationReq request);
     Boolean introspect(String token);
+    Boolean checkAdminRole(String uid);
+    Boolean checkDirectorRole(String uid);
+    Boolean checkFresherRole(String uid);
+    Boolean checkIsMyself(String uid, Long employeeId);
+    Boolean checkDirectorFresher(String directorAccId, Long fresherId);
+    Boolean checkDirectorCenter(String directorAccId, Long centerId);
+    Boolean checkEmployeeCenter(String employeeAccId, Long centerId);
 }

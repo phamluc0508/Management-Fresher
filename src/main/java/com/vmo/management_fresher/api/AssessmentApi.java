@@ -44,7 +44,7 @@ public class AssessmentApi {
             var context = SecurityContextHolder.getContext();
             String uid = context.getAuthentication().getName();
 
-            service.deleteFile(id);
+            service.deleteFile(uid, id);
             return ResponseUtils.handlerSuccess();
         }catch (Exception ex){
             return ResponseUtils.handlerException(ex);
@@ -59,7 +59,7 @@ public class AssessmentApi {
             var context = SecurityContextHolder.getContext();
             String uid = context.getAuthentication().getName();
 
-            return ResponseUtils.handlerSuccess(service.getById(id));
+            return ResponseUtils.handlerSuccess(service.getById(uid, id));
         }catch (Exception ex){
             return ResponseUtils.handlerException(ex);
         }
@@ -73,7 +73,7 @@ public class AssessmentApi {
             var context = SecurityContextHolder.getContext();
             String uid = context.getAuthentication().getName();
 
-            return ResponseUtils.handlerSuccess(service.getAllByCenterId(centerId));
+            return ResponseUtils.handlerSuccess(service.getAllByCenterId(uid, centerId));
         }catch (Exception ex){
             return ResponseUtils.handlerException(ex);
         }
@@ -87,7 +87,7 @@ public class AssessmentApi {
             var context = SecurityContextHolder.getContext();
             String uid = context.getAuthentication().getName();
 
-            Assessment assessment = service.getById(id);
+            Assessment assessment = service.getById(uid, id);
             return ResponseEntity.ok()
                     .contentType(MediaType.parseMediaType(assessment.getFileType()))
                     .header(HttpHeaders.CONTENT_DISPOSITION,

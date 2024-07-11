@@ -13,7 +13,7 @@ public interface EmployeeService {
     EmployeeRes createEmployee(String uid, EmployeeReq request);
     Employee updateEmployee(String uid, Long id, EmployeeReq request);
     String deleteEmployee(Long id);
-    Map<String, Object> getById(Long id);
+    Map<String, Object> getById(String uid, Long id);
     List<Map<String, Object>> getAll();
-    Page<Employee> searchEmployee(String name, String email, String position, String programingLanguage, Pageable pageable);
+    Page<Employee> searchEmployee(String uid, String name, String email, String position, String programingLanguage, Pageable pageable);
 }

@@ -8,6 +8,6 @@ import java.util.Map;
 public interface AssessmentFresherService {
     AssessmentFresher addAssessmentFresher(String uid, Long employeeId, Long assessmentId);
     AssessmentFresher updatePointAndProgrammingLanguage(String uid, Long id, PointProgrammingLanguageReq request);
-    String deleteAssessmentFresher(Long id, Boolean allow);
-    Map<String,Object> calAverageFresher(Long employeeId);
+    String deleteAssessmentFresher(String uid, Long id, Boolean allow);
+    Map<String,Object> calAverageFresher(String uid, Long employeeId);
 }

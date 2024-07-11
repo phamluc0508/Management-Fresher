@@ -53,7 +53,7 @@ public class EmployeeCenterApi {
             var context = SecurityContextHolder.getContext();
             String uid = context.getAuthentication().getName();
 
-            return ResponseUtils.handlerSuccess(service.removeEmployeeFromCenter(id));
+            return ResponseUtils.handlerSuccess(service.removeEmployeeFromCenter(uid, id));
         }catch (Exception ex){
             return ResponseUtils.handlerException(ex);
         }

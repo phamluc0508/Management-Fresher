@@ -9,6 +9,7 @@ import com.vmo.management_fresher.model.Employee;
 import com.vmo.management_fresher.repository.AccountRepo;
 import com.vmo.management_fresher.repository.EmployeeCenterRepo;
 import com.vmo.management_fresher.repository.EmployeeRepo;
+import com.vmo.management_fresher.service.AuthenticationService;
 import com.vmo.management_fresher.service.EmployeeService;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
@@ -16,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -31,6 +33,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     private final AccountRepo accountRepo;
     private final EmployeeCenterRepo employeeCenterRepo;
     private final PasswordEncoder passwordEncoder;
+    private final AuthenticationService authenticationService;
+    private final EmployeeRepo employeeRepo;
 
     public void valid(EmployeeReq request){
         if(StringUtils.isEmpty(request.getFirstName())){
@@ -84,6 +88,10 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     public Employee updateEmployee(String uid, Long id, EmployeeReq request){
+        if(!authenticationService.checkAdminRole(uid) && !uid.equals(id)){
+            throw new AccessDeniedException("no-permission");
+        }
+
         valid(request);
         Employee employee = repo.findById(id).orElseThrow(() -> new EntityNotFoundException("employee-not-found-with-id: " + id));
         employee.setFirstName(request.getFirstName());
@@ -116,7 +124,11 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public Map<String, Object> getById(Long id){
+    public Map<String, Object> getById(String uid, Long id){
+        if(!authenticationService.checkAdminRole(uid) && !uid.equals(id)
+                && !authenticationService.checkDirectorFresher(uid, id)){
+            throw new AccessDeniedException("no-permission");
+        }
         var employee = repo.getEmployeeById(id).orElseThrow(() -> new EntityNotFoundException("employee-not-found-with-id: " + id));
         List<Map<String, Object>> employeeCenter = employeeCenterRepo.getByEmployeeId(id);
         Map<String, Object> result = new HashMap<>(employee);
@@ -130,8 +142,16 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public Page<Employee> searchEmployee(String name, String email, String position, String programingLanguage, Pageable pageable){
-        return repo.searchEmployee(name, email, position, programingLanguage, pageable);
+    public Page<Employee> searchEmployee(String uid, String name, String email, String position, String programingLanguage, Pageable pageable){
+        Page<Employee> result = null;
+        if(authenticationService.checkAdminRole(uid)){
+            result = repo.searchEmployee(name, email, position, programingLanguage, pageable);
+        } else if(authenticationService.checkDirectorRole(uid)){
+            Employee employee = employeeRepo.findByAccountId(uid).orElseThrow(() -> new EntityNotFoundException("employee-not-found"));
+            List<Long> centerIds = employeeCenterRepo.findCenterIdsByDirectorId(employee.getId(), Constant.DIRECTOR_POSITION);
+            result = repo.searchEmployeeByCenterIds(name, email, position, programingLanguage, centerIds, pageable);
+        }
+        return result;
     }
 
 

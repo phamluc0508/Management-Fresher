@@ -86,7 +86,7 @@ public class CenterApi {
             var context = SecurityContextHolder.getContext();
             String uid = context.getAuthentication().getName();
 
-            return ResponseUtils.handlerSuccess(service.getById(id));
+            return ResponseUtils.handlerSuccess(service.getById(uid, id));
         }catch (Exception ex){
             return ResponseUtils.handlerException(ex);
         }
