@@ -86,8 +86,8 @@ public class SecurityConfig {
                 .anyRequest()
                 .authenticated());
 
-        httpSecurity.exceptionHandling()
-                .accessDeniedHandler(customAccessDeniedHandler);
+        httpSecurity.exceptionHandling(exceptionHandlingConfigurer ->
+                exceptionHandlingConfigurer.accessDeniedHandler(customAccessDeniedHandler));
 
         httpSecurity.oauth2ResourceServer(oauth2 ->
                 oauth2.jwt(jwtConfigurer ->
