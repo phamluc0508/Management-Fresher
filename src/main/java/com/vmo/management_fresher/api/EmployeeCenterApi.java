@@ -31,7 +31,7 @@ public class EmployeeCenterApi {
     }
 
     @PutMapping("/{id}")
-    protected ResponseEntity create(
+    protected ResponseEntity moveEmployee(
             @PathVariable("id") Long id,
             @RequestBody EmployeeCenterReq request
     ){
