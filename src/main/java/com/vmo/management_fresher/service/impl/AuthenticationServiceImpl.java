@@ -17,29 +17,39 @@ import com.vmo.management_fresher.repository.EmployeeRepo;
 import com.vmo.management_fresher.service.AuthenticationService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.text.ParseException;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
 import java.util.StringJoiner;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AuthenticationServiceImpl implements AuthenticationService {
     private final AccountRepo accountRepo;
     private final EmployeeCenterRepo employeeCenterRepo;
     private final EmployeeRepo employeeRepo;
+    private final RedisTemplate<String, String> redisTemplate;
 
     @Value("${jwt.signer.key}")
     private String SIGNER_KEY;
+
+    @Value("${jwt.expiration}")
+    private Long TOKEN_EXPIRATION;
+
+    @Value("${jwt.refresh.expiration}")
+    private Long REFRESH_EXPIRATION;
 
     @Override
     public AuthenticationRes login(AuthenticationReq request){
@@ -62,8 +72,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
                 .subject(account.getId())
                 .issuer("localhost:8080")
-                .issueTime(new Date())
-                .expirationTime(new Date(Instant.now().plus(1, ChronoUnit.HOURS).toEpochMilli()))
+                .issueTime(new Date(System.currentTimeMillis()))
+//                .expirationTime(new Date(Instant.now().plus(1, ChronoUnit.HOURS).toEpochMilli()))
+                .expirationTime(new Date(System.currentTimeMillis() + TOKEN_EXPIRATION))
                 .jwtID(UUID.randomUUID().toString())
                 .claim("scope", buildScope(account))
                 .build();
@@ -89,16 +100,22 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         return stringJoiner.toString();
     }
 
-    private SignedJWT verifyToken(String token){
+    private SignedJWT verifyToken(String token, Boolean isRefresh, String uid){
         try {
             JWSVerifier verifier = new MACVerifier(SIGNER_KEY.getBytes());
             SignedJWT signedJWT = SignedJWT.parse(token);
 
-            Date expityTime = signedJWT.getJWTClaimsSet().getExpirationTime();
+            Date expityTime = (isRefresh)
+                    ? new Date(signedJWT.getJWTClaimsSet().getIssueTime().getTime() + REFRESH_EXPIRATION)
+                    : signedJWT.getJWTClaimsSet().getExpirationTime();
+            String jwtID = signedJWT.getJWTClaimsSet().getJWTID();
+            String accountId = signedJWT.getJWTClaimsSet().getSubject();
 
             var verified = signedJWT.verify(verifier);
-            if (!(verified && expityTime.after(new Date()))) {
-                throw new RuntimeException("User-is-not-authenticated");
+            if (!(verified && expityTime.after(new Date()))
+                    || isTokenBlacklisted(jwtID)
+                    || (uid != null && !uid.equals(accountId))) {
+                throw new InsufficientAuthenticationException("Unauthorized");
             }
 
             return signedJWT;
@@ -110,12 +127,56 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public Boolean introspect(String token){
         try{
-            verifyToken(token);
+            verifyToken(token, false, null);
         } catch (Exception ex){
             return false;
         }
 
         return true;
+    }
+
+    @Override
+    public String logout(String uid, String token) {
+            try {
+                SignedJWT signedJWT = verifyToken(token, true, uid);
+                String jwtID = signedJWT.getJWTClaimsSet().getJWTID();
+                blacklistToken(jwtID);
+
+            } catch (InsufficientAuthenticationException e) {
+                log.info("Token already expired");
+            } catch (ParseException e) {
+                throw new RuntimeException(e);
+            }
+
+        return "Logout success!";
+    }
+
+    @Override
+    public AuthenticationRes refreshToken(String uid, String token) {
+        try {
+            SignedJWT signedJWT = verifyToken(token, true, uid);
+            String jwtID = signedJWT.getJWTClaimsSet().getJWTID();
+
+            String accountId = signedJWT.getJWTClaimsSet().getSubject();
+            Account account = accountRepo.findById(accountId).orElseThrow(() -> new EntityNotFoundException("account-not-found-with: " + uid));
+
+            blacklistToken(jwtID);
+
+            AuthenticationRes result = new AuthenticationRes();
+            result.setToken(generateToken(account));
+
+            return result;
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void blacklistToken(String jwtID){
+            redisTemplate.opsForValue().set(jwtID, "blacklisted", TOKEN_EXPIRATION, TimeUnit.MILLISECONDS);
+    }
+
+    private Boolean isTokenBlacklisted(String jwtID){
+            return Boolean.TRUE.equals(redisTemplate.hasKey(jwtID));
     }
 
     @Override

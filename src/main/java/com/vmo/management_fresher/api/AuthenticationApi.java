@@ -43,4 +43,32 @@ public class AuthenticationApi {
             return ResponseUtils.handlerException(ex);
         }
     }
+
+    @PostMapping("/logout")
+    protected ResponseEntity logout(
+            @RequestParam String token
+    ){
+        try{
+            var context = SecurityContextHolder.getContext();
+            String uid = context.getAuthentication().getName();
+
+            return ResponseUtils.handlerSuccess(service.logout(uid, token));
+        } catch (Exception ex){
+            return ResponseUtils.handlerException(ex);
+        }
+    }
+
+    @PostMapping("/refresh-token")
+    protected ResponseEntity refreshToken(
+            @RequestParam String token
+    ){
+        try {
+            var context = SecurityContextHolder.getContext();
+            String uid = context.getAuthentication().getName();
+
+            return ResponseUtils.handlerSuccess(service.refreshToken(uid, token));
+        } catch (Exception ex){
+            return ResponseUtils.handlerException(ex);
+        }
+    }
 }
