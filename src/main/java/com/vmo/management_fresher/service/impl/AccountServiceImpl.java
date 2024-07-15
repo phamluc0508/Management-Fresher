@@ -52,6 +52,10 @@ public class AccountServiceImpl implements AccountService {
         Account account = new Account();
         account.setUsername(request.getUsername());
         account.setPassword(passwordEncoder.encode(request.getPassword()));
+
+        Role role = roleRepo.findById(Constant.OTHER_ROLE).orElseThrow(() -> new EntityNotFoundException("role-not-found-with: " + Constant.OTHER_ROLE));
+        account.setRole(role);
+
         account.setCreatedBy(uid);
         account.setUpdatedBy(uid);
 

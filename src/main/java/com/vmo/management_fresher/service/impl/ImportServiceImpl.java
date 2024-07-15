@@ -30,6 +30,7 @@ public class ImportServiceImpl implements ImportService {
     private final CenterRepo centerRepo;
     private final EmployeeCenterRepo employeeCenterRepo;
     private final PositionRepo positionRepo;
+    private final RoleRepo roleRepo;
     private final PasswordEncoder passwordEncoder;
 
     private String[] splitFullName(String fullName){
@@ -74,6 +75,7 @@ public class ImportServiceImpl implements ImportService {
         }
 
         Position position = positionRepo.findById(Constant.FRESHER_POSITION).orElseThrow(() -> new EntityNotFoundException("position-not-found-with-name: " + Constant.FRESHER_POSITION));
+        Role role = roleRepo.findById(Constant.FRESHER_ROLE).orElseThrow(() -> new EntityNotFoundException("role-not-found-with :" + Constant.FRESHER_ROLE));
 
         try {
             Workbook workbook;
@@ -178,6 +180,7 @@ public class ImportServiceImpl implements ImportService {
                     Account account = new Account();
                     account.setUsername(employee.getEmail());
                     account.setPassword(passwordEncoder.encode(Constant.PASSWORD_DEFAULT));
+                    account.setRole(role);
                     account.setCreatedBy(uid);
                     account.setUpdatedBy(uid);
                     accounts.add(account);
