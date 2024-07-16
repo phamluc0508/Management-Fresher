@@ -217,13 +217,15 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public Boolean checkDirectorFresher(String directorAccId, Long fresherId){
-        EmployeeCenter fresherCenter = employeeCenterRepo.findByEmployeeIdAndPositionName(fresherId, Constant.FRESHER_POSITION)
-                .orElseThrow(() -> new EntityNotFoundException("fresher-not-exist-or-stays-in-more-than-1-center"));
+        var fresherCenter = employeeCenterRepo.findByEmployeeIdAndPositionName(fresherId, Constant.FRESHER_POSITION);
+        if(fresherCenter.isEmpty()){
+            return false;
+        }
 
         Employee director = employeeRepo.findByAccountId(directorAccId).orElseThrow(() -> new EntityNotFoundException("account-not-found"));
         List<EmployeeCenter> employeeCenters = employeeCenterRepo.findAllByEmployeeIdAndPositionName(director.getId(), Constant.DIRECTOR_POSITION);
         for(EmployeeCenter employeeCenter : employeeCenters){
-            if(employeeCenter.getCenterId() == fresherCenter.getCenterId()){
+            if(employeeCenter.getCenterId() == fresherCenter.get().getCenterId()){
                 return true;
             }
         }

@@ -36,7 +36,7 @@ public class AssessmentServiceImpl implements AssessmentService {
         }
         String fileName = StringUtils.cleanPath(file.getOriginalFilename());
 
-        var exist = repo.existsByFileName(fileName);
+        var exist = repo.existsByFileNameAndCenterId(fileName, centerId);
         if(exist){
             throw new EntityExistsException("name-file-existed");
         }

@@ -13,6 +13,7 @@ import com.vmo.management_fresher.repository.PositionRepo;
 import com.vmo.management_fresher.service.AccountService;
 import com.vmo.management_fresher.service.AuthenticationService;
 import com.vmo.management_fresher.service.EmployeeCenterService;
+import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
@@ -51,6 +52,8 @@ public class EmployeeCenterServiceImpl implements EmployeeCenterService {
             accountService.addRoleAccount(uid, employee.getAccountId(), Constant.FRESHER_ROLE);
         }else if(position.equals(Constant.DIRECTOR_POSITION)){
             accountService.addRoleAccount(uid, employee.getAccountId(), Constant.DIRECTOR_ROLE);
+        }else if(position.equals(Constant.OTHER_POSITION)){
+            accountService.addRoleAccount(uid, employee.getAccountId(), Constant.OTHER_ROLE);
         }
     }
 
@@ -64,6 +67,8 @@ public class EmployeeCenterServiceImpl implements EmployeeCenterService {
             }
         } else if(repo.existsByEmployeeIdAndPositionName(request.getEmployeeId(), Constant.FRESHER_POSITION)){
             throw new RuntimeException("employee-is-currently-fresher");
+        } else if(repo.existsByEmployeeIdAndCenterIdAndPositionName(request.getEmployeeId(), request.getCenterId(), Constant.DIRECTOR_POSITION)){
+            throw new EntityExistsException("employee-is-currently-director-in-the-center");
         }
 
         EmployeeCenter employeeCenter = new EmployeeCenter();
@@ -98,7 +103,11 @@ public class EmployeeCenterServiceImpl implements EmployeeCenterService {
         employeeCenter.setPosition(position);
         employeeCenter.setUpdatedBy(uid);
 
-        return repo.save(employeeCenter);
+        employeeCenter = repo.save(employeeCenter);
+
+        updateRoleOfAccount(uid, request.getEmployeeId(), request.getPosition());
+
+        return employeeCenter;
     }
 
     @Override
@@ -110,6 +119,9 @@ public class EmployeeCenterServiceImpl implements EmployeeCenterService {
         }
 
         repo.delete(employeeCenter);
+
+        updateRoleOfAccount(uid, employeeCenter.getEmployeeId(), Constant.OTHER_POSITION);
+
         return "Success!";
     }
 

@@ -32,14 +32,14 @@ public class AssessmentFresherServiceImpl implements AssessmentFresherService {
     public AssessmentFresher addAssessmentFresher(String uid, Long employeeId, Long assessmentId){
         Assessment assessment = assessmentRepo.findById(assessmentId).orElseThrow(() -> new EntityNotFoundException("assessment-not-found-with-id: " + assessmentId));
 
-        if(!employeeCenterRepo.existsByEmployeeIdAndCenterIdAndPositionName(employeeId, assessment.getCenterId(), Constant.FRESHER_POSITION)){
-            throw new EntityExistsException("employee-is-not-fresher-in-the-center");
+        if(!authenticationService.checkAdminRole(uid)
+                && (!authenticationService.checkDirectorCenter(uid, assessment.getCenterId())
+                || !authenticationService.checkDirectorFresher(uid, employeeId))){
+            throw new AccessDeniedException("no-permission");
         }
 
-        if(!authenticationService.checkAdminRole(uid)
-                && !authenticationService.checkDirectorCenter(uid, assessment.getCenterId())
-                && !authenticationService.checkDirectorFresher(uid, employeeId)){
-            throw new AccessDeniedException("no-permission");
+        if(!employeeCenterRepo.existsByEmployeeIdAndCenterIdAndPositionName(employeeId, assessment.getCenterId(), Constant.FRESHER_POSITION)){
+            throw new EntityExistsException("employee-is-not-fresher-in-the-center");
         }
 
         List<Integer> assessmentTypes = repo.getAssessmentTypeByEmployeeId(employeeId);

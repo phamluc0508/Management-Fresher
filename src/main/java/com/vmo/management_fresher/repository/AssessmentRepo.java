@@ -11,7 +11,7 @@ import java.util.List;
 
 @Repository
 public interface AssessmentRepo extends JpaRepository<Assessment, Long> {
-    Boolean existsByFileName(String fileName);
+    Boolean existsByFileNameAndCenterId(String fileName, Long centerId);
 
     @Query(value = "select new com.vmo.management_fresher.dto.response.AssessmentRes" +
             "(a.id, a.fileName, null ,a.fileType, a.fileSize, a.assessmentType, a.centerId)" +

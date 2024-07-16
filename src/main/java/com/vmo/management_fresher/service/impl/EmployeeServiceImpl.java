@@ -87,8 +87,11 @@ public class EmployeeServiceImpl implements EmployeeService {
         return employeeRes;
     }
 
+    @Override
     public Employee updateEmployee(String uid, Long id, EmployeeReq request){
-        if(!authenticationService.checkAdminRole(uid) && !uid.equals(id)){
+        if(!authenticationService.checkAdminRole(uid)
+                && !authenticationService.checkIsMyself(uid, id)
+                && !authenticationService.checkDirectorFresher(uid, id)){
             throw new AccessDeniedException("no-permission");
         }
 
@@ -125,7 +128,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public Map<String, Object> getById(String uid, Long id){
-        if(!authenticationService.checkAdminRole(uid) && !uid.equals(id)
+        if(!authenticationService.checkAdminRole(uid)
+                && !authenticationService.checkIsMyself(uid, id)
                 && !authenticationService.checkDirectorFresher(uid, id)){
             throw new AccessDeniedException("no-permission");
         }

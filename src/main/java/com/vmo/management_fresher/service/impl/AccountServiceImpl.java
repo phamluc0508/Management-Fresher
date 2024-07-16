@@ -113,7 +113,9 @@ public class AccountServiceImpl implements AccountService {
         }
         if(roleName.equals(Constant.ADMIN_ROLE)){
             throw new RuntimeException("role-cannot-be-admin");
-        } else if(!(roleName.equals(Constant.DIRECTOR_ROLE) || roleName.equals(Constant.FRESHER_ROLE))){
+        } else if(!(roleName.equals(Constant.DIRECTOR_ROLE)
+                || roleName.equals(Constant.FRESHER_ROLE)
+                || roleName.equals(Constant.OTHER_ROLE))){
             throw new RuntimeException("invalid-role-format");
         }
 
