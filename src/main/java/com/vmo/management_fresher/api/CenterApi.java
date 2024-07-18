@@ -3,7 +3,7 @@ package com.vmo.management_fresher.api;
 import com.vmo.management_fresher.dto.request.GroupCenterReq;
 import com.vmo.management_fresher.model.Center;
 import com.vmo.management_fresher.service.CenterService;
-import com.vmo.management_fresher.utility.ResponseUtils;
+import com.vmo.management_fresher.utils.ResponseUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;

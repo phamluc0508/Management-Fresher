@@ -171,12 +171,21 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         }
     }
 
-    private void blacklistToken(String jwtID){
+    private void blacklistToken(String jwtID) {
+        log.info("Attempting to blacklist token with ID: {}", jwtID);
+        try {
             redisTemplate.opsForValue().set(jwtID, "blacklisted", TOKEN_EXPIRATION, TimeUnit.MILLISECONDS);
+            log.info("Token blacklisted successfully");
+        } catch (Exception e) {
+            log.error("Error blacklisting token: ", e);
+        }
     }
 
-    private Boolean isTokenBlacklisted(String jwtID){
-            return Boolean.TRUE.equals(redisTemplate.hasKey(jwtID));
+    private Boolean isTokenBlacklisted(String jwtID) {
+        log.info("Checking if token is blacklisted: {}", jwtID);
+        Boolean result = Boolean.TRUE.equals(redisTemplate.hasKey(jwtID));
+        log.info("Token blacklist status: {}", result);
+        return result;
     }
 
     @Override

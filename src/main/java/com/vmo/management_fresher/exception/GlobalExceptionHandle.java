@@ -1,6 +1,6 @@
 package com.vmo.management_fresher.exception;
 
-import com.vmo.management_fresher.utility.ApiResponse;
+import com.vmo.management_fresher.utils.ApiResponse;
 import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

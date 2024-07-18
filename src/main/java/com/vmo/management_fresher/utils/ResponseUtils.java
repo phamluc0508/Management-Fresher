@@ -1,4 +1,4 @@
-package com.vmo.management_fresher.utility;
+package com.vmo.management_fresher.utils;
 
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;

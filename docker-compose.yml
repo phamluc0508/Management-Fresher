@@ -1,0 +1,51 @@
+services:
+
+  postgresql:
+    image: postgres
+    ports:
+      - ${DB_PORT}:5432
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    networks:
+      - freshermanagement-network
+
+  redis:
+    image: redis
+    ports:
+      - ${REDIS_PORT}:6379
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - freshermanagement-network
+
+  fresher-management:
+    container_name: freshermanagementcontainer
+    build:
+      context: .
+      args:
+        CONTAINER_PORT: ${CONTAINER_PORT}
+    image: freshermanagement:v1
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgresql/${DB_NAME}
+      SPRING_DATASOURCE_USERNAME: ${DB_USER}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+      SPRING_REDIS_HOST: redis
+      SPRING_REDIS_PORT: ${REDIS_PORT}
+    ports:
+      - ${HOST_PORT}:${CONTAINER_PORT}
+    depends_on:
+      redis:
+        condition: service_healthy
+      postgresql:
+        condition: service_started
+    networks:
+      - freshermanagement-network
+
+networks:
+  freshermanagement-network:
+    driver: bridge

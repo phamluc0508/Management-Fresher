@@ -1,7 +1,7 @@
 package com.vmo.management_fresher.configuration.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.vmo.management_fresher.utility.ApiResponse;
+import com.vmo.management_fresher.utils.ApiResponse;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
