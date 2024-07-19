@@ -16,6 +16,7 @@ import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -105,6 +106,7 @@ public class AccountServiceImpl implements AccountService {
         return "Success!";
     }
 
+    @CacheEvict(cacheNames = "authenCache", allEntries = true)
     @Override
     public Account addRoleAccount(String uid, String id, String roleName){
         Account account = repo.findById(id).orElseThrow(() -> new EntityNotFoundException("Account-not-found-with-id: " + id));
