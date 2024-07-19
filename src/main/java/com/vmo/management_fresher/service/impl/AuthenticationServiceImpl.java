@@ -213,11 +213,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Cacheable(cacheNames = "checkAdminRole", key = "#uid")
     @Override
     public Boolean checkAdminRole(String uid){
+        log.info("Checking admin role for user: {}", uid);
         Account account = accountRepo.findById(uid).orElseThrow(() -> new EntityNotFoundException("account-not-found-with-id: " + uid));
-        if(account.getRole().getName().equals(Constant.ADMIN_ROLE)){
-            return true;
-        }
-        return false;
+        boolean isAdmin = account.getRole().getName().equals(Constant.ADMIN_ROLE);
+        log.info("User {} is admin: {}", uid, isAdmin);
+        return isAdmin;
     }
 
     @Cacheable(key = "#uid")

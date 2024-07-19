@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
@@ -34,7 +35,13 @@ public class RedisConfig {
     private long TTL;
 
     @Bean
-    public RedisTemplate<String, String> redisTemplate(LettuceConnectionFactory redisConnectionFactory){
+    public LettuceConnectionFactory redisConnectionFactory() {
+        RedisStandaloneConfiguration configuration = new RedisStandaloneConfiguration(REDIS_HOST, REDIS_PORT);
+        return new LettuceConnectionFactory(configuration);
+    }
+
+    @Bean
+    public RedisTemplate<String, String> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
         RedisTemplate<String, String> template = new RedisTemplate<>();
         template.setConnectionFactory(redisConnectionFactory);
         template.setKeySerializer(new StringRedisSerializer());
@@ -43,7 +50,7 @@ public class RedisConfig {
     }
 
     @Bean
-    public RedisTemplate<String, Serializable> redisCacheTemplate(LettuceConnectionFactory redisConnectionFactory) {
+    public RedisTemplate<String, Serializable> redisCacheTemplate(RedisConnectionFactory redisConnectionFactory) {
         RedisTemplate<String, Serializable> template = new RedisTemplate<>();
         template.setKeySerializer(new StringRedisSerializer());
         template.setValueSerializer(new GenericJackson2JsonRedisSerializer());
@@ -60,16 +67,17 @@ public class RedisConfig {
                         RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()))
                 .serializeValuesWith(RedisSerializationContext.SerializationPair
                         .fromSerializer(new GenericJackson2JsonRedisSerializer()));
-        RedisCacheManager redisCacheManager = RedisCacheManager.builder(factory).cacheDefaults(redisCacheConfiguration)
-                .build();
-        return redisCacheManager;
+        return RedisCacheManager.builder(factory).cacheDefaults(redisCacheConfiguration).build();
     }
 
     @PostConstruct
     public void clearCache() {
-        System.out.println("In Clear Cache");
-        Jedis jedis = new Jedis(REDIS_HOST, REDIS_PORT, 1000);
-        jedis.flushAll();
-        jedis.close();
+        log.info("Clearing Redis cache");
+        try (Jedis jedis = new Jedis(REDIS_HOST, REDIS_PORT, 5000)) {
+            jedis.flushAll();
+            log.info("Redis cache cleared successfully");
+        } catch (Exception e) {
+            log.error("Error clearing Redis cache", e);
+        }
     }
 }

@@ -20,9 +20,9 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class DashboardServiceImpl implements DashboardService {
     private final EmployeeRepo repo;
-    private AuthenticationService authenticationService;
-    private EmployeeRepo employeeRepo;
-    private EmployeeCenterRepo employeeCenterRepo;
+    private final AuthenticationService authenticationService;
+    private final EmployeeRepo employeeRepo;
+    private final EmployeeCenterRepo employeeCenterRepo;
 
     @Override
     public Map<String, Object> numberFreshersCenter(String uid, Long centerId){
