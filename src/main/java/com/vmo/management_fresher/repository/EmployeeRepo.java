@@ -90,29 +90,34 @@ public interface EmployeeRepo extends JpaRepository<Employee, Long> {
 
     @Query(value = "select a.assessmentType as type" +
             " , af.point as point" +
-            ", e as employees" +
+            " , e as employees" +
+            " , count(e.id) as quantity" +
             " from Employee e" +
             " inner join EmployeeCenter ec on e.id = ec.employeeId" +
             " inner join AssessmentFresher af on e.id = af.employeeId" +
             " inner join Assessment a on a.id = af.assessmentId" +
             " where ec.position.name = :position" +
+            " group by a.assessmentType, af.point, e" +
             " order by a.assessmentType, af.point")
     List<Map<String, Object>> findEmployeesByPoint(@Param("position") String position);
 
     @Query(value = "select a.assessmentType as type" +
             " , af.point as point" +
-            ", e as employees" +
+            " , e as employees" +
+            " , count(e.id) as quantity" +
             " from Employee e" +
             " inner join EmployeeCenter ec on e.id = ec.employeeId" +
             " inner join AssessmentFresher af on e.id = af.employeeId" +
             " inner join Assessment a on a.id = af.assessmentId" +
             " where ec.position.name = :position" +
             " and ec.centerId IN (:centerIds)" +
+            " group by a.assessmentType, af.point, e" +
             " order by a.assessmentType, af.point")
     List<Map<String, Object>> findEmployeesByPointAndCenterIds(@Param("centerIds")List<Long> centerIds, @Param("position") String position);
 
     @Query(value = "select e as employees" +
             " , AVG(af.point) as point" +
+            " , count(e.id) as quantity" +
             " from Employee e" +
             " inner join EmployeeCenter ec on e.id = ec.employeeId" +
             " inner join AssessmentFresher af on e.id = af.employeeId" +
@@ -126,6 +131,7 @@ public interface EmployeeRepo extends JpaRepository<Employee, Long> {
 
     @Query(value = "select e as employees" +
             " , AVG(af.point) as point" +
+            " , count(e.id) as quantity" +
             " from Employee e" +
             " inner join EmployeeCenter ec on e.id = ec.employeeId" +
             " inner join AssessmentFresher af on e.id = af.employeeId" +
