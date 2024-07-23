@@ -12,10 +12,10 @@ import io.swagger.v3.oas.annotations.servers.Server;
 
 @OpenAPIDefinition(
         info = @Info(
-                title = "Management fresher Api",
-                description = "Doing CRUD Operation",
-                summary = "This app-api will add,delete,create,update",
-                termsOfService = "T&C",
+                title = "Fresher Management Api",
+                description = "Fresher Management System",
+                summary = "This app-api will add,delete,create,update,get",
+                termsOfService = "Terms of service",
                 contact = @Contact(
                         name = "lucpv",
                         email = "lucpv508@gmail.com"
@@ -45,7 +45,7 @@ import io.swagger.v3.oas.annotations.servers.Server;
         type = SecuritySchemeType.HTTP,
         bearerFormat = "JWT",
         scheme = "bearer",
-        description = "security desc"
+        description = "JWT auth description"
 )
 public class OpenApiConfig {
 }

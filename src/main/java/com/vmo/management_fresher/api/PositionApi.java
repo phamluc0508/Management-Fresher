@@ -3,6 +3,8 @@ package com.vmo.management_fresher.api;
 import com.vmo.management_fresher.model.Position;
 import com.vmo.management_fresher.service.PositionService;
 import com.vmo.management_fresher.utils.ResponseUtils;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +19,11 @@ public class PositionApi {
     private final PositionService service;
 
     @PostMapping()
+    @Operation(
+            summary = "Create a new position",
+            description = "Create a new position with the specified details. The position information should be provided in the request body",
+            tags = {"Position"}
+    )
     protected ResponseEntity createPosition(
             @RequestBody Position request
     ){
@@ -31,7 +38,14 @@ public class PositionApi {
     }
 
     @PutMapping("/{name}")
+    @Operation(
+            summary = "Update an existing position",
+            description = "Update the details of an existing position identified by the position name." +
+                    " The updated position information should be provided in the request body.",
+            tags = {"Position"}
+    )
     protected ResponseEntity updatePosition(
+            @Parameter(description = "The name of the position to be updated", required = true)
             @PathVariable("name") String name,
             @RequestBody Position request
     ){
@@ -46,7 +60,14 @@ public class PositionApi {
     }
 
     @DeleteMapping("/{name}")
+    @Operation(
+            summary = "Delete a position by name",
+            description = "Delete an existing position identified by the position name." +
+                    " The position name should be provided as a path variable.",
+            tags = {"Position"}
+    )
     protected ResponseEntity deletePosition(
+            @Parameter(description = "The name of the position to be deleted", required = true)
             @PathVariable("name") String name
     ){
         try{
@@ -60,7 +81,14 @@ public class PositionApi {
     }
 
     @GetMapping("/{name}")
+    @Operation(
+            summary = "Get position by name",
+            description = "Retrieve the details of a position identified by the position name" +
+                    " The position name should be provided as a path variable.",
+            tags = {"Position"}
+    )
     protected ResponseEntity getById(
+            @Parameter(description = "The name of the position to be retrieved", required = true)
             @PathVariable("name") String name
     ){
         try{
@@ -74,6 +102,11 @@ public class PositionApi {
     }
 
     @GetMapping("/get-all")
+    @Operation(
+            summary = "Get all positions",
+            description = "Retrieve a list of all positions",
+            tags = {"Position"}
+    )
     protected ResponseEntity getAll(){
         try {
             var context = SecurityContextHolder.getContext();

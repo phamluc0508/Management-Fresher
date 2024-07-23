@@ -66,10 +66,14 @@ public class SecurityConfig {
             "/assessment/get-by-centerId/{centerId}", "/dashboard/number-freshers-by-center", "/dashboard/freshers-by-point", "/dashboard/freshers-by-avg",
     };
 
+    private final String[] PUBLIC_POST_ENDPOINTS = {
+            "/auth/login", "forgot-password/verify-email", "forgot-password/change-password"
+    };
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception{
         httpSecurity.authorizeHttpRequests(request -> request.requestMatchers(SWAGGER_ENDPOINTS).permitAll()
-                .requestMatchers(HttpMethod.POST,"/auth/login").permitAll()
+                .requestMatchers(HttpMethod.POST, PUBLIC_POST_ENDPOINTS).permitAll()
 
                 .requestMatchers(HttpMethod.POST, ADMIN_POST_ENDPOINTS).hasRole(Constant.ADMIN_ROLE)
                 .requestMatchers(HttpMethod.PUT, ADMIN_PUT_ENDPOINTS).hasRole(Constant.ADMIN_ROLE)

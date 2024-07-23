@@ -1,5 +1,6 @@
 package com.vmo.management_fresher.utils;
 
+import com.vmo.management_fresher.exception.ExpectationFailedException;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
@@ -33,6 +34,8 @@ public class ResponseUtils {
             httpStatus = HttpStatus.FORBIDDEN;
         } else if (ex instanceof InsufficientAuthenticationException){
             httpStatus = HttpStatus.UNAUTHORIZED;
+        } else if (ex instanceof ExpectationFailedException){
+            httpStatus = HttpStatus.EXPECTATION_FAILED;
         } else if (ex instanceof RuntimeException) {
             httpStatus = HttpStatus.BAD_REQUEST;
         } else {

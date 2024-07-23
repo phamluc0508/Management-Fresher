@@ -21,6 +21,7 @@ public interface EmployeeRepo extends JpaRepository<Employee, Long> {
     Boolean existsByPhoneNumber(String phoneNumber);
 
     Optional<Employee> findByAccountId(String accountId);
+    Optional<Employee> findByEmail(String email);
 
     @Query(value = "select e.id as id" +
             " , e.firstName as fistName" +

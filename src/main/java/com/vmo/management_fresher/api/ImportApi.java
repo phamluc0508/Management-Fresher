@@ -2,6 +2,8 @@ package com.vmo.management_fresher.api;
 
 import com.vmo.management_fresher.service.ImportService;
 import com.vmo.management_fresher.utils.ResponseUtils;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -23,7 +25,14 @@ public class ImportApi {
     private final ImportService service;
 
     @PostMapping("/fresher-to-center")
+    @Operation(
+            summary = "Import Freshers to a Center from a excel file",
+            description = "Upload a excel file to import fresher data into a specified center." +
+                    " The file should contain details of freshers to be added to the center.",
+            tags = {"Import"}
+    )
     protected ResponseEntity importFresherToCenter(
+            @Parameter(description = "The excel file containing fresher data to be imported", required = true)
             @RequestParam("file") MultipartFile file
     ){
         try{
@@ -42,7 +51,14 @@ public class ImportApi {
     }
 
     @GetMapping("/download-error-file/{fileName}")
+    @Operation(
+            summary = "Download error excel file",
+            description = "Download a excel file containing error details for the import process." +
+                    " The file name should be provided as a path variable.",
+            tags = {"Import"}
+    )
     protected ResponseEntity downloadErrorFile(
+            @Parameter(description = "The name of the error file to be downloaded", required = true)
             @PathVariable String fileName
     ){
         try{

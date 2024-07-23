@@ -3,6 +3,8 @@ package com.vmo.management_fresher.api;
 import com.vmo.management_fresher.dto.request.AuthenticationReq;
 import com.vmo.management_fresher.service.AccountService;
 import com.vmo.management_fresher.utils.ResponseUtils;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +19,11 @@ public class AccountApi {
     private final AccountService service;
 
     @PostMapping("/registration")
+    @Operation(
+            summary = "Create new account",
+            description = "Register a new account",
+            tags = {"Account"}
+    )
     protected ResponseEntity createAccount(
             @RequestBody AuthenticationReq request
     ){
@@ -31,7 +38,13 @@ public class AccountApi {
     }
 
     @PutMapping("/{id}")
+    @Operation(
+            summary = "Update account",
+            description = "Update an existing account",
+            tags = {"Account"}
+    )
     protected ResponseEntity updateAccount(
+            @Parameter(description = "ID of the account to be updated", required = true)
             @PathVariable("id") String id,
             @RequestBody AuthenticationReq request
     ){
@@ -46,7 +59,13 @@ public class AccountApi {
     }
 
     @DeleteMapping("/{id}")
+    @Operation(
+            summary = "Delete account",
+            description = "Delete the account with the specified ID",
+            tags = {"Account"}
+    )
     protected ResponseEntity deleteAccount(
+            @Parameter(description = "ID of the account to be deleted", required = true)
             @PathVariable("id") String id
     ){
         try {
@@ -60,7 +79,13 @@ public class AccountApi {
     }
 
     @PatchMapping("/{id}/add-role-account")
+    @Operation(
+            summary = "Add role to account",
+            description = "Add a role to the account with the specified ID",
+            tags = {"Account"}
+    )
     protected ResponseEntity addRoleAccount(
+            @Parameter(description = "ID of the account to which the role will be added", required = true)
             @PathVariable("id") String id,
             @RequestBody String role
     ){
@@ -75,7 +100,13 @@ public class AccountApi {
     }
 
     @GetMapping("/{id}")
+    @Operation(
+            summary = "Get account by ID",
+            description = "Retrieve the account details for the specified ID",
+            tags = {"Account"}
+    )
     protected ResponseEntity getById(
+            @Parameter(description = "ID of the account to retrieve", required = true)
             @PathVariable("id") String id
     ){
         try {
@@ -89,6 +120,11 @@ public class AccountApi {
     }
 
     @GetMapping("/get-all")
+    @Operation(
+            summary = "Get all accounts",
+            description = "Retrieve a list of all accounts",
+            tags = {"Account"}
+    )
     protected ResponseEntity getAll(){
         try{
             var context = SecurityContextHolder.getContext();
