@@ -1,12 +1,11 @@
 package com.vmo.management_fresher.service.impl;
 
-import com.vmo.management_fresher.base.constant.Constant;
-import com.vmo.management_fresher.base.validate.Validate;
-import com.vmo.management_fresher.model.*;
-import com.vmo.management_fresher.repository.*;
-import com.vmo.management_fresher.service.ImportService;
+import java.io.*;
+import java.util.*;
+import java.util.regex.Pattern;
+
 import jakarta.persistence.EntityNotFoundException;
-import lombok.RequiredArgsConstructor;
+
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -18,9 +17,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.io.*;
-import java.util.*;
-import java.util.regex.Pattern;
+import com.vmo.management_fresher.base.constant.Constant;
+import com.vmo.management_fresher.base.validate.Validate;
+import com.vmo.management_fresher.model.*;
+import com.vmo.management_fresher.repository.*;
+import com.vmo.management_fresher.service.ImportService;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -33,7 +36,7 @@ public class ImportServiceImpl implements ImportService {
     private final RoleRepo roleRepo;
     private final PasswordEncoder passwordEncoder;
 
-    private String[] splitFullName(String fullName){
+    private String[] splitFullName(String fullName) {
         String[] parts = fullName.trim().split("\\s+");
         String firstName = "";
         String middleName = "";
@@ -50,13 +53,13 @@ public class ImportServiceImpl implements ImportService {
             middleName = String.join(" ", Arrays.copyOfRange(parts, 1, parts.length - 1));
         }
 
-        return new String[]{firstName, middleName, lastName};
+        return new String[] {firstName, middleName, lastName};
     }
 
     @Override
     public Map<String, Object> importFresherToCenter(String uid, MultipartFile file) {
-        if (!file.getContentType().equals("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") &&
-                !file.getContentType().equals("application/vnd.ms-excel")) {
+        if (!file.getContentType().equals("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+                && !file.getContentType().equals("application/vnd.ms-excel")) {
             throw new RuntimeException("non-excel-file-format");
         }
 
@@ -70,17 +73,21 @@ public class ImportServiceImpl implements ImportService {
 
         List<Center> centers = centerRepo.findAll();
         Map<String, Long> centerNamesAndIds = new HashMap<>();
-        for(Center center : centers){
+        for (Center center : centers) {
             centerNamesAndIds.put(center.getName(), center.getId());
         }
 
-        Position position = positionRepo.findById(Constant.FRESHER_POSITION).orElseThrow(() -> new EntityNotFoundException("position-not-found-with-name: " + Constant.FRESHER_POSITION));
-        Role role = roleRepo.findById(Constant.FRESHER_ROLE).orElseThrow(() -> new EntityNotFoundException("role-not-found-with :" + Constant.FRESHER_ROLE));
+        Position position = positionRepo
+                .findById(Constant.FRESHER_POSITION)
+                .orElseThrow(() ->
+                        new EntityNotFoundException("position-not-found-with-name: " + Constant.FRESHER_POSITION));
+        Role role = roleRepo.findById(Constant.FRESHER_ROLE)
+                .orElseThrow(() -> new EntityNotFoundException("role-not-found-with :" + Constant.FRESHER_ROLE));
 
         try {
             Workbook workbook;
             if (file.getContentType().equals("application/vnd.ms-excel")) {
-                    workbook = new HSSFWorkbook(file.getInputStream()); // For .xls (HSSF Workbook)
+                workbook = new HSSFWorkbook(file.getInputStream()); // For .xls (HSSF Workbook)
             } else {
                 workbook = new XSSFWorkbook(file.getInputStream()); // For .xlsx (XSSF Workbook)
             }
@@ -107,13 +114,14 @@ public class ImportServiceImpl implements ImportService {
                 StringBuilder error = new StringBuilder();
                 boolean hasError = false;
 
-                //Read data
+                // Read data
                 Cell fullNameCell = row.getCell(columnFields.get("Họ tên"));
                 Cell emailCell = row.getCell(columnFields.get("Email"));
                 Cell phoneNumberCell = row.getCell(columnFields.get("Số điện thoại"));
                 Cell centerNameCell = row.getCell(columnFields.get("Trung tâm"));
 
-                if(fullNameCell == null || fullNameCell.getStringCellValue().trim().isEmpty()){
+                if (fullNameCell == null
+                        || fullNameCell.getStringCellValue().trim().isEmpty()) {
                     error.append("name-cannot-be-empty; ");
                     hasError = true;
                 } else {
@@ -126,12 +134,13 @@ public class ImportServiceImpl implements ImportService {
                 if (emailCell == null || emailCell.getStringCellValue().trim().isEmpty()) {
                     error.append("email-cannot-be-empty; ");
                     hasError = true;
-                } else if(!Pattern.matches(Validate.EMAIL_REGEX, emailCell.getStringCellValue().trim())){
+                } else if (!Pattern.matches(
+                        Validate.EMAIL_REGEX, emailCell.getStringCellValue().trim())) {
                     error.append("invalid-email-format; ");
                     hasError = true;
                 } else {
                     String email = emailCell.getStringCellValue();
-                    if(emails.contains(email)){
+                    if (emails.contains(email)) {
                         error.append("email-used; ");
                         hasError = true;
                     } else {
@@ -139,15 +148,18 @@ public class ImportServiceImpl implements ImportService {
                     }
                 }
 
-                if (phoneNumberCell == null || phoneNumberCell.getStringCellValue().trim().isEmpty()) {
+                if (phoneNumberCell == null
+                        || phoneNumberCell.getStringCellValue().trim().isEmpty()) {
                     error.append("phone-number-cannot-be-empty; ");
                     hasError = true;
-                } else if(!Pattern.matches(Validate.PHONE_REGEX, phoneNumberCell.getStringCellValue().trim())){
+                } else if (!Pattern.matches(
+                        Validate.PHONE_REGEX,
+                        phoneNumberCell.getStringCellValue().trim())) {
                     error.append("invalid-phone-format; ");
                     hasError = true;
                 } else {
                     String phoneNumber = phoneNumberCell.getStringCellValue();
-                    if(phoneNumbers.contains(phoneNumber)){
+                    if (phoneNumbers.contains(phoneNumber)) {
                         error.append("phone-number-used; ");
                         hasError = true;
                     } else {
@@ -155,13 +167,14 @@ public class ImportServiceImpl implements ImportService {
                     }
                 }
 
-                if(centerNameCell == null || centerNameCell.getStringCellValue().trim().isEmpty()){
+                if (centerNameCell == null
+                        || centerNameCell.getStringCellValue().trim().isEmpty()) {
                     error.append("center-cannot-be-empty; ");
                     hasError = true;
                 } else {
                     String centerName = centerNameCell.getStringCellValue();
                     centerId = centerNamesAndIds.get(centerName);
-                    if(centerId == null){
+                    if (centerId == null) {
                         error.append("center-does-not-exist; ");
                         hasError = true;
                     } else {
@@ -172,7 +185,7 @@ public class ImportServiceImpl implements ImportService {
                     }
                 }
 
-                if(hasError){
+                if (hasError) {
                     Cell errorCell = row.createCell(errorColumnIndex);
                     errorCell.setCellValue(error.toString());
                     errors.add(error.toString());
@@ -197,16 +210,16 @@ public class ImportServiceImpl implements ImportService {
 
             Map<String, Object> result = new HashMap<>();
 
-            if(errors.isEmpty()){
+            if (errors.isEmpty()) {
                 List<Account> accountList = accountRepo.saveAll(accounts);
 
-                for(int i = 0; i < numOfRecord; i++){
+                for (int i = 0; i < numOfRecord; i++) {
                     Account account = accountList.get(i);
                     employees.get(i).setAccountId(account.getId());
                 }
                 List<Employee> employeeList = employeeRepo.saveAll(employees);
 
-                for(int i = 0; i < numOfRecord; i++){
+                for (int i = 0; i < numOfRecord; i++) {
                     Employee employee = employeeList.get(i);
                     employeeCenters.get(i).setEmployeeId(employee.getId());
                 }

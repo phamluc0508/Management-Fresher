@@ -1,8 +1,10 @@
 package com.vmo.management_fresher.model;
 
-import com.vmo.management_fresher.base.entity.BaseEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+
+import com.vmo.management_fresher.base.entity.BaseEntity;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -18,5 +20,6 @@ import lombok.experimental.SuperBuilder;
 public class ProgrammingLanguage extends BaseEntity {
     @Id
     String name;
+
     String description;
 }

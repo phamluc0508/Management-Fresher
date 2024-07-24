@@ -1,12 +1,14 @@
 package com.vmo.management_fresher.model;
 
-import com.vmo.management_fresher.base.entity.BaseEntity;
-import com.vmo.management_fresher.dto.request.EmployeeReq;
-import com.vmo.management_fresher.dto.response.EmployeeRes;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+
+import com.vmo.management_fresher.base.entity.BaseEntity;
+import com.vmo.management_fresher.dto.request.EmployeeReq;
+import com.vmo.management_fresher.dto.response.EmployeeRes;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -36,7 +38,7 @@ public class Employee extends BaseEntity {
 
     private String accountId;
 
-    public static Employee of(String uid, EmployeeReq request){
+    public static Employee of(String uid, EmployeeReq request) {
         return Employee.builder()
                 .id(request.getId())
                 .firstName(request.getFirstName())
@@ -49,7 +51,7 @@ public class Employee extends BaseEntity {
                 .build();
     }
 
-    public static EmployeeRes toRES(Employee request){
+    public static EmployeeRes toRES(Employee request) {
         return EmployeeRes.builder()
                 .id(request.getId())
                 .firstName(request.getFirstName())
@@ -61,5 +63,8 @@ public class Employee extends BaseEntity {
                 .build();
     }
 
-    public EmployeeRes toRES(){return toRES(this);};
+    public EmployeeRes toRES() {
+        return toRES(this);
+    }
+    ;
 }

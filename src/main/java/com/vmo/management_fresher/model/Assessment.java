@@ -1,7 +1,9 @@
 package com.vmo.management_fresher.model;
 
-import com.vmo.management_fresher.base.entity.BaseEntity;
 import jakarta.persistence.*;
+
+import com.vmo.management_fresher.base.entity.BaseEntity;
+
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
@@ -15,12 +17,14 @@ public class Assessment extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String fileName;
     private String fileType;
     private Long fileSize;
 
     @Lob
     private byte[] fileContent;
+
     private Integer assessmentType;
     private Long centerId;
 }

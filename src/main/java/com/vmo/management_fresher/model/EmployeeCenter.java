@@ -1,7 +1,9 @@
 package com.vmo.management_fresher.model;
 
-import com.vmo.management_fresher.base.entity.BaseEntity;
 import jakarta.persistence.*;
+
+import com.vmo.management_fresher.base.entity.BaseEntity;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

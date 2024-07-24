@@ -1,5 +1,24 @@
 package com.vmo.management_fresher.service.impl;
 
+import java.text.ParseException;
+import java.util.Date;
+import java.util.List;
+import java.util.StringJoiner;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+
+import jakarta.persistence.EntityNotFoundException;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.authentication.InsufficientAuthenticationException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
@@ -15,25 +34,9 @@ import com.vmo.management_fresher.repository.AccountRepo;
 import com.vmo.management_fresher.repository.EmployeeCenterRepo;
 import com.vmo.management_fresher.repository.EmployeeRepo;
 import com.vmo.management_fresher.service.AuthenticationService;
-import jakarta.persistence.EntityNotFoundException;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cache.annotation.CacheConfig;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.security.authentication.InsufficientAuthenticationException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
-
-import java.text.ParseException;
-import java.util.Date;
-import java.util.List;
-import java.util.StringJoiner;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -55,11 +58,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private Long REFRESH_EXPIRATION;
 
     @Override
-    public AuthenticationRes login(AuthenticationReq request){
+    public AuthenticationRes login(AuthenticationReq request) {
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
 
-        Account account = accountRepo.findByUsername(request.getUsername()).orElseThrow(() -> new EntityNotFoundException("not-found-with-username: " + request.getUsername()));
-        if(!passwordEncoder.matches(request.getPassword(), account.getPassword())){
+        Account account = accountRepo
+                .findByUsername(request.getUsername())
+                .orElseThrow(() -> new EntityNotFoundException("not-found-with-username: " + request.getUsername()));
+        if (!passwordEncoder.matches(request.getPassword(), account.getPassword())) {
             throw new RuntimeException("wrong-password");
         }
 
@@ -69,14 +74,14 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         return result;
     }
 
-    private String generateToken(Account account){
+    private String generateToken(Account account) {
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
 
         JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
                 .subject(account.getId())
                 .issuer("localhost:8080")
                 .issueTime(new Date(System.currentTimeMillis()))
-//                .expirationTime(new Date(Instant.now().plus(1, ChronoUnit.HOURS).toEpochMilli()))
+                //                .expirationTime(new Date(Instant.now().plus(1, ChronoUnit.HOURS).toEpochMilli()))
                 .expirationTime(new Date(System.currentTimeMillis() + TOKEN_EXPIRATION))
                 .jwtID(UUID.randomUUID().toString())
                 .claim("scope", buildScope(account))
@@ -95,15 +100,15 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         return jwsObject.serialize();
     }
 
-    private String buildScope(Account account){
+    private String buildScope(Account account) {
         StringJoiner stringJoiner = new StringJoiner(" ");
-        if(!StringUtils.isEmpty(account.getRole())){
+        if (!StringUtils.isEmpty(account.getRole())) {
             stringJoiner.add("ROLE_" + account.getRole().getName());
         }
         return stringJoiner.toString();
     }
 
-    private SignedJWT verifyToken(String token, Boolean isRefresh, String uid){
+    private SignedJWT verifyToken(String token, Boolean isRefresh, String uid) {
         try {
             JWSVerifier verifier = new MACVerifier(SIGNER_KEY.getBytes());
             SignedJWT signedJWT = SignedJWT.parse(token);
@@ -122,34 +127,35 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             }
 
             return signedJWT;
-        } catch (JOSEException | ParseException ex){
+        } catch (JOSEException | ParseException ex) {
             throw new RuntimeException(ex);
         }
     }
 
     @Override
-    public Boolean introspect(String token){
-        try{
+    public Boolean introspect(String token) {
+        // spotless:off
+        try {
             verifyToken(token, false, null);
-        } catch (Exception ex){
+        } catch (Exception ex) {
             return false;
         }
-
+        // spotless:on
         return true;
     }
 
     @Override
     public String logout(String uid, String token) {
-            try {
-                SignedJWT signedJWT = verifyToken(token, true, uid);
-                String jwtID = signedJWT.getJWTClaimsSet().getJWTID();
-                blacklistToken(token);
+        try {
+            SignedJWT signedJWT = verifyToken(token, true, uid);
+            String jwtID = signedJWT.getJWTClaimsSet().getJWTID();
+            blacklistToken(token);
 
-            } catch (InsufficientAuthenticationException e) {
-                log.info("Token already expired");
-            } catch (ParseException e) {
-                throw new RuntimeException(e);
-            }
+        } catch (InsufficientAuthenticationException e) {
+            log.info("Token already expired");
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
 
         return "Logout success!";
     }
@@ -161,7 +167,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             String jwtID = signedJWT.getJWTClaimsSet().getJWTID();
 
             String accountId = signedJWT.getJWTClaimsSet().getSubject();
-            Account account = accountRepo.findById(accountId).orElseThrow(() -> new EntityNotFoundException("account-not-found-with: " + uid));
+            Account account = accountRepo
+                    .findById(accountId)
+                    .orElseThrow(() -> new EntityNotFoundException("account-not-found-with: " + uid));
 
             blacklistToken(token);
 
@@ -185,7 +193,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
             // Calculate the remaining time until expiration
             long currentTimeMillis = System.currentTimeMillis();
-            long expirationTimeMillis = signedJWT.getJWTClaimsSet().getIssueTime().getTime() + REFRESH_EXPIRATION;
+            long expirationTimeMillis =
+                    signedJWT.getJWTClaimsSet().getIssueTime().getTime() + REFRESH_EXPIRATION;
             long remainingTimeMillis = expirationTimeMillis - currentTimeMillis;
 
             // Only blacklist if the token is not already expired
@@ -212,9 +221,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Cacheable(cacheNames = "checkAdminRole", key = "#uid")
     @Override
-    public Boolean checkAdminRole(String uid){
+    public Boolean checkAdminRole(String uid) {
         log.info("Checking admin role for user: {}", uid);
-        Account account = accountRepo.findById(uid).orElseThrow(() -> new EntityNotFoundException("account-not-found-with-id: " + uid));
+        Account account = accountRepo
+                .findById(uid)
+                .orElseThrow(() -> new EntityNotFoundException("account-not-found-with-id: " + uid));
         boolean isAdmin = account.getRole().getName().equals(Constant.ADMIN_ROLE);
         log.info("User {} is admin: {}", uid, isAdmin);
         return isAdmin;
@@ -222,9 +233,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Cacheable(key = "#uid")
     @Override
-    public Boolean checkDirectorRole(String uid){
-        Account account = accountRepo.findById(uid).orElseThrow(() -> new EntityNotFoundException("account-not-found-with-id: " + uid));
-        if(account.getRole().getName().equals(Constant.DIRECTOR_ROLE)){
+    public Boolean checkDirectorRole(String uid) {
+        Account account = accountRepo
+                .findById(uid)
+                .orElseThrow(() -> new EntityNotFoundException("account-not-found-with-id: " + uid));
+        if (account.getRole().getName().equals(Constant.DIRECTOR_ROLE)) {
             return true;
         }
         return false;
@@ -232,9 +245,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Cacheable(key = "#uid")
     @Override
-    public Boolean checkFresherRole(String uid){
-        Account account = accountRepo.findById(uid).orElseThrow(() -> new EntityNotFoundException("account-not-found-with-id: " + uid));
-        if(account.getRole().getName().equals(Constant.FRESHER_ROLE)){
+    public Boolean checkFresherRole(String uid) {
+        Account account = accountRepo
+                .findById(uid)
+                .orElseThrow(() -> new EntityNotFoundException("account-not-found-with-id: " + uid));
+        if (account.getRole().getName().equals(Constant.FRESHER_ROLE)) {
             return true;
         }
         return false;
@@ -243,8 +258,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Cacheable(key = "#uid + '-' + #employeeId")
     @Override
     public Boolean checkIsMyself(String uid, Long employeeId) {
-        Employee employee = employeeRepo.findById(employeeId).orElseThrow(() -> new EntityNotFoundException("employee-not-found"));
-        if(employee.getAccountId().equals(uid)){
+        Employee employee =
+                employeeRepo.findById(employeeId).orElseThrow(() -> new EntityNotFoundException("employee-not-found"));
+        if (employee.getAccountId().equals(uid)) {
             return true;
         }
         return false;
@@ -252,16 +268,19 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Cacheable(key = "#directorAccId + '-' + #fresherId")
     @Override
-    public Boolean checkDirectorFresher(String directorAccId, Long fresherId){
+    public Boolean checkDirectorFresher(String directorAccId, Long fresherId) {
         var fresherCenter = employeeCenterRepo.findByEmployeeIdAndPositionName(fresherId, Constant.FRESHER_POSITION);
-        if(fresherCenter.isEmpty()){
+        if (fresherCenter.isEmpty()) {
             return false;
         }
 
-        Employee director = employeeRepo.findByAccountId(directorAccId).orElseThrow(() -> new EntityNotFoundException("account-not-found"));
-        List<EmployeeCenter> employeeCenters = employeeCenterRepo.findAllByEmployeeIdAndPositionName(director.getId(), Constant.DIRECTOR_POSITION);
-        for(EmployeeCenter employeeCenter : employeeCenters){
-            if(employeeCenter.getCenterId() == fresherCenter.get().getCenterId()){
+        Employee director = employeeRepo
+                .findByAccountId(directorAccId)
+                .orElseThrow(() -> new EntityNotFoundException("account-not-found"));
+        List<EmployeeCenter> employeeCenters =
+                employeeCenterRepo.findAllByEmployeeIdAndPositionName(director.getId(), Constant.DIRECTOR_POSITION);
+        for (EmployeeCenter employeeCenter : employeeCenters) {
+            if (employeeCenter.getCenterId() == fresherCenter.get().getCenterId()) {
                 return true;
             }
         }
@@ -271,9 +290,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Cacheable(key = "#directorAccId + '-' + #centerId")
     @Override
     public Boolean checkDirectorCenter(String directorAccId, Long centerId) {
-        Employee director = employeeRepo.findByAccountId(directorAccId).orElseThrow(() -> new EntityNotFoundException("account-not-found"));
-        var directorCenter = employeeCenterRepo.findByEmployeeIdAndCenterIdAndPositionName(director.getId(), centerId, Constant.DIRECTOR_POSITION);
-        if(directorCenter.isPresent()){
+        Employee director = employeeRepo
+                .findByAccountId(directorAccId)
+                .orElseThrow(() -> new EntityNotFoundException("account-not-found"));
+        var directorCenter = employeeCenterRepo.findByEmployeeIdAndCenterIdAndPositionName(
+                director.getId(), centerId, Constant.DIRECTOR_POSITION);
+        if (directorCenter.isPresent()) {
             return true;
         }
         return false;
@@ -282,9 +304,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Cacheable(key = "#employeeAccId + '-' + #centerId")
     @Override
     public Boolean checkEmployeeCenter(String employeeAccId, Long centerId) {
-        Employee employee = employeeRepo.findByAccountId(employeeAccId).orElseThrow(() -> new EntityNotFoundException("account-not-found"));
+        Employee employee = employeeRepo
+                .findByAccountId(employeeAccId)
+                .orElseThrow(() -> new EntityNotFoundException("account-not-found"));
         var employeeCenter = employeeCenterRepo.findByEmployeeIdAndCenterId(employee.getId(), centerId);
-        if(employeeCenter.isPresent()){
+        if (employeeCenter.isPresent()) {
             return true;
         }
         return false;

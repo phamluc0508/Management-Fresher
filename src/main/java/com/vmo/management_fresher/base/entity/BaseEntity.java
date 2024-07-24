@@ -1,17 +1,19 @@
 package com.vmo.management_fresher.base.entity;
 
+import java.io.Serializable;
+import java.time.LocalDateTime;
+
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.PersistenceException;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
+
+import org.springframework.util.StringUtils;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import org.springframework.util.StringUtils;
-
-import java.io.Serializable;
-import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
@@ -26,10 +28,10 @@ public abstract class BaseEntity implements Serializable {
 
     @PrePersist
     void setInitialDate() {
-        if(StringUtils.isEmpty(createdBy)){
+        if (StringUtils.isEmpty(createdBy)) {
             throw new PersistenceException("create-by-cannot-be-null");
         }
-        if(StringUtils.isEmpty(updatedBy)){
+        if (StringUtils.isEmpty(updatedBy)) {
             throw new PersistenceException("update-by-cannot-be-null");
         }
         createdAt = updatedAt = LocalDateTime.now();
