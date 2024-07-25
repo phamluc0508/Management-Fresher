@@ -31,7 +31,7 @@ public class SecurityConfig {
     };
 
     private static final String[] ADMIN_POST_ENDPOINTS = {
-//        "/account/registration",
+        "/account/registration",
         "/center", "/center/group-two-center",
         "/employee", "/employee-center",
         "/import/fresher-to-center",
@@ -87,7 +87,6 @@ public class SecurityConfig {
 
     private static final String[] PUBLIC_POST_ENDPOINTS = {
         "/auth/login", "forgot-password/verify-email", "forgot-password/change-password",
-        "/account/registration"
     };
 
     private static final String[] PUBLIC_GET_ENDPOINTS = {
