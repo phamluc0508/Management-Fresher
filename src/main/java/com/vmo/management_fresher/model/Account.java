@@ -20,6 +20,7 @@ public class Account extends BaseEntity {
 
     @Column(name = "username", unique = true)
     private String username;
+
     private String password;
 
     @ManyToOne

@@ -32,8 +32,10 @@ public class SecurityConfig {
 
     private static final String[] ADMIN_POST_ENDPOINTS = {
         "/account/registration",
-        "/center", "/center/group-two-center",
-        "/employee", "/employee-center",
+        "/center",
+        "/center/group-two-center",
+        "/employee",
+        "/employee-center",
         "/import/fresher-to-center",
         "/position",
         "/programming-language",
@@ -90,7 +92,7 @@ public class SecurityConfig {
     };
 
     private static final String[] PUBLIC_GET_ENDPOINTS = {
-            "/import/download-error-file/{fileName}", "/assessment/download/{id}"
+        "/import/download-error-file/{fileName}", "/assessment/download/{id}"
     };
 
     @Bean
