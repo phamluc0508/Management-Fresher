@@ -3,6 +3,7 @@ package com.vmo.management_fresher.utils;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -30,7 +31,7 @@ public class ResponseUtils {
         HttpStatus httpStatus;
         if (ex instanceof EntityNotFoundException) {
             httpStatus = HttpStatus.NOT_FOUND;
-        } else if (ex instanceof EntityExistsException) {
+        } else if (ex instanceof EntityExistsException || ex instanceof DataIntegrityViolationException) {
             httpStatus = HttpStatus.CONFLICT;
         } else if (ex instanceof AccessDeniedException) {
             httpStatus = HttpStatus.FORBIDDEN;

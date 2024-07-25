@@ -1,5 +1,6 @@
 package com.vmo.management_fresher.configuration;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -23,6 +24,10 @@ public class ApplicationInitConfig {
     private final PasswordEncoder passwordEncoder;
 
     private static final String ADMIN_USER_NAME = "admin";
+    private static final String SYSTEM_NAME = "system";
+
+    @Value("${admin.password}")
+    private String adminPassword;
 
     @Bean
     @ConditionalOnProperty(
@@ -35,17 +40,17 @@ public class ApplicationInitConfig {
                 Role adminRole = Role.builder()
                         .name(Constant.ADMIN_ROLE)
                         .description("Admin role")
-                        .createdBy("admin")
-                        .updatedBy("admin")
+                        .createdBy(SYSTEM_NAME)
+                        .updatedBy(SYSTEM_NAME)
                         .build();
                 roleRepo.save(adminRole);
 
                 accountRepo.save(Account.builder()
-                        .username("admin")
-                        .password(passwordEncoder.encode("admin"))
+                        .username(ADMIN_USER_NAME)
+                        .password(passwordEncoder.encode(adminPassword))
                         .role(adminRole)
-                        .createdBy("admin")
-                        .updatedBy("admin")
+                        .createdBy(SYSTEM_NAME)
+                        .updatedBy(SYSTEM_NAME)
                         .build());
                 log.warn("admin user has been created with default password: admin, please change it");
             }

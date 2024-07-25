@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import com.vmo.management_fresher.model.Role;
+import com.vmo.management_fresher.repository.RoleRepo;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 
@@ -38,6 +40,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationService authenticationService;
     private final EmployeeRepo employeeRepo;
+    private final RoleRepo roleRepo;
 
     public void valid(EmployeeReq request) {
         if (StringUtils.isEmpty(request.getFirstName())) {
@@ -76,7 +79,10 @@ public class EmployeeServiceImpl implements EmployeeService {
         // create Account for new Employee
         Account account = new Account();
         account.setUsername(request.getEmail());
-        account.setPassword(passwordEncoder.encode(Constant.PASSWORD_DEFAULT));
+        account.setPassword(passwordEncoder.encode(request.getPhoneNumber()));
+        Role role = roleRepo.findById(Constant.OTHER_ROLE)
+                .orElseThrow(() -> new EntityNotFoundException("role-not-found-with: " + Constant.OTHER_ROLE));
+        account.setRole(role);
         account.setCreatedBy(uid);
         account.setUpdatedBy(uid);
         account = accountRepo.save(account);

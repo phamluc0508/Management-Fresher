@@ -1,7 +1,7 @@
 package com.vmo.management_fresher.service.impl;
 
+import java.security.SecureRandom;
 import java.util.Objects;
-import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -30,6 +30,8 @@ public class EmailServiceImpl implements EmailService {
     private final PasswordEncoder passwordEncoder;
     private final RedisTemplate<String, String> redisTemplate;
 
+    private final SecureRandom secureRandom = new SecureRandom();
+
     @Value("${spring.mail.username}")
     private String MAIL_FROM;
 
@@ -37,8 +39,7 @@ public class EmailServiceImpl implements EmailService {
     private Long OTP_EXPIRATION;
 
     private Integer otpGenerator() {
-        Random random = new Random();
-        return random.nextInt(100_000, 999_999);
+        return 100_000 + secureRandom.nextInt(900_000); // Generates a number between 100_000 and 999_999
     }
 
     @Override
@@ -60,21 +61,20 @@ public class EmailServiceImpl implements EmailService {
         return "Email sent for verification";
     }
 
-    private Boolean verifyOtp(String accountId, Integer otp) {
+    private void verifyOtp(String accountId, Integer otp) {
         String value = redisTemplate.opsForValue().get(String.valueOf(otp));
         if (value == null || !value.equals(accountId)) {
-            return false;
+            throw new ExpectationFailedException("otp-has-expired");
         }
-        return true;
     }
 
     @Override
     public String changePassword(String password, String repeatPassword, String email, Integer otp) {
         Employee employee =
                 employeeRepo.findByEmail(email).orElseThrow(() -> new EntityNotFoundException("invalid-email"));
-        if (!verifyOtp(employee.getAccountId(), otp)) {
-            throw new ExpectationFailedException("otp-has-expired");
-        }
+
+        verifyOtp(employee.getAccountId(), otp);
+
         if (!Objects.equals(password, repeatPassword)) {
             throw new ExpectationFailedException("please-enter-password-again");
         }

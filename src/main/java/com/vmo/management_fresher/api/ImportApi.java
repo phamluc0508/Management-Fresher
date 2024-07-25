@@ -61,11 +61,12 @@ public class ImportApi {
             @Parameter(description = "The name of the error file to be downloaded", required = true) @PathVariable
                     String fileName) {
         try {
-            var context = SecurityContextHolder.getContext();
-            String uid = context.getAuthentication().getName();
 
             File file = new File(System.getProperty("java.io.tmpdir") + "/" + fileName);
-            byte[] fileContent = new FileInputStream(file).readAllBytes();
+            byte[] fileContent;
+            try (FileInputStream fis = new FileInputStream(file)) {
+                fileContent = fis.readAllBytes();
+            }
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);

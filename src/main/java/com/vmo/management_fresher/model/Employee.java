@@ -1,9 +1,6 @@
 package com.vmo.management_fresher.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 import com.vmo.management_fresher.base.entity.BaseEntity;
 import com.vmo.management_fresher.dto.request.EmployeeReq;
@@ -32,8 +29,10 @@ public class Employee extends BaseEntity {
 
     private String lastName;
 
+    @Column(name = "email", unique = true)
     private String email;
 
+    @Column(name = "phone_number", unique = true)
     private String phoneNumber;
 
     private String accountId;

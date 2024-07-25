@@ -19,7 +19,7 @@ public class Center extends BaseEntity {
     @Column
     private Long id;
 
-    @Column
+    @Column(name = "email", unique = true)
     private String name;
 
     @Column
