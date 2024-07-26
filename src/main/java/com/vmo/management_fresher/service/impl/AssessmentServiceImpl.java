@@ -56,11 +56,11 @@ public class AssessmentServiceImpl implements AssessmentService {
                 && assessmentType != Constant.ASSESSMENT_LEVEL_1
                 && assessmentType != Constant.ASSESSMENT_LEVEL_2
                 && assessmentType != Constant.ASSESSMENT_LEVEL_3) {
-            throw new IllegalArgumentException("invalid-type-assessment-value: " + assessmentType);
+            throw new IllegalArgumentException("invalid-type-assessment-value");
         }
         assessment.setAssessmentType(assessmentType);
         if (!centerRepo.existsById(centerId)) {
-            throw new IllegalArgumentException("center-exist-with-id: " + centerId);
+            throw new EntityNotFoundException("center-not-found");
         }
         assessment.setCenterId(centerId);
         assessment.setCreatedBy(uid);
@@ -87,7 +87,7 @@ public class AssessmentServiceImpl implements AssessmentService {
     @Override
     public String deleteFile(String uid, Long id) {
         Assessment assessment =
-                repo.findById(id).orElseThrow(() -> new EntityNotFoundException("not-found-with-id: " + id));
+                repo.findById(id).orElseThrow(() -> new EntityNotFoundException("assessment-not-found"));
 
         if (!authenticationService.checkAdminRole(uid)
                 && !authenticationService.checkDirectorCenter(uid, assessment.getCenterId())) {
@@ -105,7 +105,7 @@ public class AssessmentServiceImpl implements AssessmentService {
     @Override
     public Assessment getById(String uid, Long id) {
         Assessment assessment =
-                repo.findById(id).orElseThrow(() -> new EntityNotFoundException("not-found-with-id: " + id));
+                repo.findById(id).orElseThrow(() -> new EntityNotFoundException("assessment-not-found"));
         AssessmentFresher assessmentFresher = assessmentFresherRepo
                 .findByAssessmentId(id)
                 .orElseThrow(() -> new EntityNotFoundException("assessment-fresher-not-found"));

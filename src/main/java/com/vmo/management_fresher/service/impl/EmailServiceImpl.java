@@ -83,6 +83,6 @@ public class EmailServiceImpl implements EmailService {
 
         String encodePassword = passwordEncoder.encode(password);
         accountRepo.updatePassword(employee.getAccountId(), encodePassword);
-        return "password-has-been-changed";
+        return "Password has been changed";
     }
 }

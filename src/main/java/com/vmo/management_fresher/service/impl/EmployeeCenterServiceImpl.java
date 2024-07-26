@@ -40,7 +40,7 @@ public class EmployeeCenterServiceImpl implements EmployeeCenterService {
             Employee employee = employeeRepo
                     .findById(request.getEmployeeId())
                     .orElseThrow(() ->
-                            new EntityNotFoundException("employee-not-found-with-id: " + request.getEmployeeId()));
+                            new EntityNotFoundException("employee-not-found"));
         }
         if (request.getCenterId() == null) {
             throw new RuntimeException("centerId-by-cannot-be-null");
@@ -48,7 +48,7 @@ public class EmployeeCenterServiceImpl implements EmployeeCenterService {
             Center center = centerRepo
                     .findById(request.getCenterId())
                     .orElseThrow(
-                            () -> new EntityNotFoundException("center-not-found-with-id: " + request.getCenterId()));
+                            () -> new EntityNotFoundException("center-not-found"));
         }
         if (StringUtils.isEmpty(request.getPosition())) {
             throw new RuntimeException("position-by-cannot-be-null");
@@ -58,7 +58,7 @@ public class EmployeeCenterServiceImpl implements EmployeeCenterService {
     private void updateRoleOfAccount(String uid, Long employeeId, String position) {
         Employee employee = employeeRepo
                 .findById(employeeId)
-                .orElseThrow(() -> new EntityNotFoundException("employee-not-found-with-id: " + employeeId));
+                .orElseThrow(() -> new EntityNotFoundException("employee-not-found"));
         if (position.equals(Constant.FRESHER_POSITION)) {
             accountService.addRoleAccount(uid, employee.getAccountId(), Constant.FRESHER_ROLE);
         } else if (position.equals(Constant.DIRECTOR_POSITION)) {
@@ -74,7 +74,7 @@ public class EmployeeCenterServiceImpl implements EmployeeCenterService {
         Position position = positionRepo
                 .findById(request.getPosition())
                 .orElseThrow(
-                        () -> new EntityNotFoundException("position-not-found-with-name: " + request.getPosition()));
+                        () -> new EntityNotFoundException("position-not-found"));
         if (request.getPosition().equals(Constant.FRESHER_POSITION)) {
             if (repo.existsByEmployeeId(request.getEmployeeId())) {
                 throw new RuntimeException("employee-is-currently-in-the-center");
@@ -107,7 +107,7 @@ public class EmployeeCenterServiceImpl implements EmployeeCenterService {
         Position position = positionRepo
                 .findById(request.getPosition())
                 .orElseThrow(
-                        () -> new EntityNotFoundException("position-not-found-with-name: " + request.getPosition()));
+                        () -> new EntityNotFoundException("position-not-found"));
         if (request.getPosition().equals(Constant.FRESHER_POSITION)) {
             if (repo.existsByEmployeeIdAndIdIsNot(request.getEmployeeId(), id)) {
                 throw new RuntimeException("employee-cannot-be-fresher");
@@ -115,7 +115,7 @@ public class EmployeeCenterServiceImpl implements EmployeeCenterService {
         }
 
         EmployeeCenter employeeCenter = repo.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("employee-center-not-found-with-id: " + id));
+                .orElseThrow(() -> new EntityNotFoundException("employee-center-not-found"));
 
         employeeCenter.setEmployeeId(request.getEmployeeId());
         employeeCenter.setCenterId(request.getCenterId());
@@ -132,7 +132,7 @@ public class EmployeeCenterServiceImpl implements EmployeeCenterService {
     @Override
     public String removeEmployeeFromCenter(String uid, Long id) {
         EmployeeCenter employeeCenter = repo.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("employeeCenter-not-found-with-id: " + id));
+                .orElseThrow(() -> new EntityNotFoundException("employee-center-not-found"));
 
         if (!authenticationService.checkAdminRole(uid)
                 && !authenticationService.checkDirectorFresher(uid, employeeCenter.getEmployeeId())) {

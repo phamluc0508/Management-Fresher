@@ -45,7 +45,7 @@ public class RoleServiceImpl implements RoleService {
         valid(request);
 
         Role role =
-                repo.findById(name).orElseThrow(() -> new EntityNotFoundException("role-not-found-with-name: " + name));
+                repo.findById(name).orElseThrow(() -> new EntityNotFoundException("role-not-found"));
         role.setName(request.getName());
         role.setDescription(request.getDescription());
         role.setUpdatedBy(uid);
@@ -56,14 +56,14 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public String deleteRole(String name) {
         var exist =
-                repo.findById(name).orElseThrow(() -> new EntityNotFoundException("role-not-found-with-name: " + name));
+                repo.findById(name).orElseThrow(() -> new EntityNotFoundException("role-not-found"));
         repo.deleteById(name);
         return "successfully delete role with id: " + name;
     }
 
     @Override
     public Role getById(String name) {
-        return repo.findById(name).orElseThrow(() -> new EntityNotFoundException("role-not-found-with-name: " + name));
+        return repo.findById(name).orElseThrow(() -> new EntityNotFoundException("role-not-found"));
     }
 
     @Override

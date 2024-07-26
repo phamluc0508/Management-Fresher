@@ -3,6 +3,10 @@ package com.vmo.management_fresher.utils;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.context.NoSuchMessageException;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,8 +14,21 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
 
 import com.vmo.management_fresher.exception.ExpectationFailedException;
+import org.springframework.stereotype.Component;
 
+import java.util.Locale;
+
+
+@Component
 public class ResponseUtils {
+
+    private static MessageSource messageSource;
+
+    @Autowired
+    public void setMessageSource(MessageSource messageSource) {
+        ResponseUtils.messageSource = messageSource;
+    }
+
     public static <T> ResponseEntity<ApiResponse<T>> handlerSuccess(T data) {
         ApiResponse<T> response = new ApiResponse<>();
         response.setData(data);
@@ -44,9 +61,18 @@ public class ResponseUtils {
         } else {
             httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
         }
+
+        String message = ex.getMessage();
+        Locale locale = LocaleContextHolder.getLocale();
+        try {
+            message = messageSource.getMessage(message, null, locale);
+        } catch (NoSuchMessageException e){
+
+        }
+
         ApiResponse<Object> response = new ApiResponse<>();
         response.setCode(httpStatus.value());
-        response.setMessage(ex.getMessage());
+        response.setMessage(message);
         response.setStatus("ERROR");
         return ResponseEntity.status(httpStatus).body(response);
     }

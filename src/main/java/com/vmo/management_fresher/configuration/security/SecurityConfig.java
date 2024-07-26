@@ -18,11 +18,8 @@ public class SecurityConfig {
 
     private final CustomJwtDecoder customJwtDecoder;
 
-    private final CustomAccessDeniedHandler customAccessDeniedHandler;
-
-    public SecurityConfig(CustomJwtDecoder customJwtDecoder, CustomAccessDeniedHandler customAccessDeniedHandler) {
+    public SecurityConfig(CustomJwtDecoder customJwtDecoder) {
         this.customJwtDecoder = customJwtDecoder;
-        this.customAccessDeniedHandler = customAccessDeniedHandler;
     }
 
     private static final String[] SWAGGER_ENDPOINTS = {
@@ -127,7 +124,7 @@ public class SecurityConfig {
                 .authenticated());
 
         httpSecurity.exceptionHandling(exceptionHandlingConfigurer ->
-                exceptionHandlingConfigurer.accessDeniedHandler(customAccessDeniedHandler));
+                exceptionHandlingConfigurer.accessDeniedHandler(new CustomAccessDeniedHandler()));
 
         httpSecurity.oauth2ResourceServer(oauth2 -> oauth2.jwt(jwtConfigurer -> jwtConfigurer
                         .decoder(customJwtDecoder)

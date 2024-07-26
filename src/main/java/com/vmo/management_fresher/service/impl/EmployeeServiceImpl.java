@@ -81,7 +81,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         account.setUsername(request.getEmail());
         account.setPassword(passwordEncoder.encode(request.getPhoneNumber()));
         Role role = roleRepo.findById(Constant.OTHER_ROLE)
-                .orElseThrow(() -> new EntityNotFoundException("role-not-found-with: " + Constant.OTHER_ROLE));
+                .orElseThrow(() -> new EntityNotFoundException("role-not-found"));
         account.setRole(role);
         account.setCreatedBy(uid);
         account.setUpdatedBy(uid);
@@ -107,7 +107,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         valid(request);
         Employee employee =
-                repo.findById(id).orElseThrow(() -> new EntityNotFoundException("employee-not-found-with-id: " + id));
+                repo.findById(id).orElseThrow(() -> new EntityNotFoundException("employee-not-found"));
         employee.setFirstName(request.getFirstName());
         employee.setMiddleName(request.getMiddleName());
         employee.setLastName(request.getLastName());
@@ -131,7 +131,7 @@ public class EmployeeServiceImpl implements EmployeeService {
             throw new EntityExistsException("employee-is-currently-in-the-center");
         }
         Employee employee =
-                repo.findById(id).orElseThrow(() -> new EntityNotFoundException("employee-not-found-with-id: " + id));
+                repo.findById(id).orElseThrow(() -> new EntityNotFoundException("employee-not-found"));
         accountRepo.deleteById(employee.getAccountId());
         repo.delete(employee);
 
@@ -146,7 +146,7 @@ public class EmployeeServiceImpl implements EmployeeService {
             throw new AccessDeniedException("no-permission");
         }
         var employee = repo.getEmployeeById(id)
-                .orElseThrow(() -> new EntityNotFoundException("employee-not-found-with-id: " + id));
+                .orElseThrow(() -> new EntityNotFoundException("employee-not-found"));
         List<Map<String, Object>> employeeCenter = employeeCenterRepo.getByEmployeeId(id);
         Map<String, Object> result = new HashMap<>(employee);
         result.put("position", employeeCenter);

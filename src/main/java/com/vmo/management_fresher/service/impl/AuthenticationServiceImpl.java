@@ -63,7 +63,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         Account account = accountRepo
                 .findByUsername(request.getUsername())
-                .orElseThrow(() -> new EntityNotFoundException("not-found-with-username: " + request.getUsername()));
+                .orElseThrow(() -> new EntityNotFoundException("account-not-found"));
         if (!passwordEncoder.matches(request.getPassword(), account.getPassword())) {
             throw new RuntimeException("wrong-password");
         }
@@ -123,7 +123,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             if (!(verified && expityTime.after(new Date()))
                     || isTokenBlacklisted(jwtID)
                     || (uid != null && !uid.equals(accountId))) {
-                throw new InsufficientAuthenticationException("Unauthorized");
+                throw new InsufficientAuthenticationException("Unauthorized!");
             }
 
             return signedJWT;
@@ -169,7 +169,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             String accountId = signedJWT.getJWTClaimsSet().getSubject();
             Account account = accountRepo
                     .findById(accountId)
-                    .orElseThrow(() -> new EntityNotFoundException("account-not-found-with: " + uid));
+                    .orElseThrow(() -> new EntityNotFoundException("account-not-found"));
 
             blacklistToken(token);
 
@@ -225,7 +225,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         log.info("Checking admin role for user: {}", uid);
         Account account = accountRepo
                 .findById(uid)
-                .orElseThrow(() -> new EntityNotFoundException("account-not-found-with-id: " + uid));
+                .orElseThrow(() -> new EntityNotFoundException("account-not-found"));
         boolean isAdmin = account.getRole().getName().equals(Constant.ADMIN_ROLE);
         log.info("User {} is admin: {}", uid, isAdmin);
         return isAdmin;
@@ -236,7 +236,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     public Boolean checkDirectorRole(String uid) {
         Account account = accountRepo
                 .findById(uid)
-                .orElseThrow(() -> new EntityNotFoundException("account-not-found-with-id: " + uid));
+                .orElseThrow(() -> new EntityNotFoundException("account-not-found"));
         if (account.getRole().getName().equals(Constant.DIRECTOR_ROLE)) {
             return true;
         }
@@ -248,7 +248,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     public Boolean checkFresherRole(String uid) {
         Account account = accountRepo
                 .findById(uid)
-                .orElseThrow(() -> new EntityNotFoundException("account-not-found-with-id: " + uid));
+                .orElseThrow(() -> new EntityNotFoundException("account-not-found"));
         if (account.getRole().getName().equals(Constant.FRESHER_ROLE)) {
             return true;
         }

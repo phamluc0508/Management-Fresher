@@ -45,7 +45,7 @@ public class ProgrammingLanguageServiceImpl implements ProgrammingLanguageServic
         valid(request);
 
         ProgrammingLanguage programmingLanguage = repo.findById(name)
-                .orElseThrow(() -> new EntityNotFoundException("programming-language-not-found-with-name: " + name));
+                .orElseThrow(() -> new EntityNotFoundException("programming-language-not-found"));
         programmingLanguage.setName(request.getName());
         programmingLanguage.setDescription(request.getDescription());
         programmingLanguage.setUpdatedBy(uid);
@@ -56,15 +56,15 @@ public class ProgrammingLanguageServiceImpl implements ProgrammingLanguageServic
     @Override
     public String deleteProgrammingLanguage(String name) {
         var exist = repo.findById(name)
-                .orElseThrow(() -> new EntityNotFoundException("programming-language-not-found-with-name: " + name));
-        repo.deleteById(name);
-        return "successfully delete programmingLanguage with id: " + name;
+                .orElseThrow(() -> new EntityNotFoundException("programming-language-not-found"));
+        repo.delete(exist);
+        return "Successfully delete programmingLanguage with id: " + name;
     }
 
     @Override
     public ProgrammingLanguage getById(String name) {
         return repo.findById(name)
-                .orElseThrow(() -> new EntityNotFoundException("programming-language-not-found-with-name: " + name));
+                .orElseThrow(() -> new EntityNotFoundException("programming-language-not-found"));
     }
 
     @Override

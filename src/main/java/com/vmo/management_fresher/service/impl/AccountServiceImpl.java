@@ -58,7 +58,7 @@ public class AccountServiceImpl implements AccountService {
         account.setPassword(passwordEncoder.encode(request.getPassword()));
 
         Role role = roleRepo.findById(Constant.OTHER_ROLE)
-                .orElseThrow(() -> new EntityNotFoundException("role-not-found-with: " + Constant.OTHER_ROLE));
+                .orElseThrow(() -> new EntityNotFoundException("role-not-found"));
         account.setRole(role);
 
         account.setCreatedBy(uid);
@@ -87,7 +87,7 @@ public class AccountServiceImpl implements AccountService {
             throw new EntityExistsException("username-existed");
         }
         Account account =
-                repo.findById(id).orElseThrow(() -> new EntityNotFoundException("account-not-found-with-id: " + id));
+                repo.findById(id).orElseThrow(() -> new EntityNotFoundException("account-not-found"));
         account.setUsername(request.getUsername());
         account.setPassword(passwordEncoder.encode(request.getPassword()));
         account.setUpdatedBy(uid);
@@ -100,11 +100,11 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public String deleteAccount(String id) {
         Account account =
-                repo.findById(id).orElseThrow(() -> new EntityNotFoundException("account-not-found-with-id: " + id));
+                repo.findById(id).orElseThrow(() -> new EntityNotFoundException("account-not-found"));
 
         Employee employee = employeeRepo
                 .findByAccountId(id)
-                .orElseThrow(() -> new EntityNotFoundException("employee-not-found-with-accountId: " + id));
+                .orElseThrow(() -> new EntityNotFoundException("employee-not-found"));
         if (employeeCenterRepo.existsByEmployeeId(employee.getId())) {
             throw new EntityExistsException("employee-is-currently-in-the-center");
         }
@@ -118,9 +118,9 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public Account addRoleAccount(String uid, String id, String roleName) {
         Account account =
-                repo.findById(id).orElseThrow(() -> new EntityNotFoundException("Account-not-found-with-id: " + id));
+                repo.findById(id).orElseThrow(() -> new EntityNotFoundException("account-not-found"));
         if (account.getUsername().equals("admin")) {
-            throw new RuntimeException("invalid-id: " + id);
+            throw new RuntimeException("invalid-id");
         }
         if (roleName.equals(Constant.ADMIN_ROLE)) {
             throw new RuntimeException("role-cannot-be-admin");
@@ -145,7 +145,7 @@ public class AccountServiceImpl implements AccountService {
 
         AccountRes result = new AccountRes();
         Account account =
-                repo.findById(id).orElseThrow(() -> new EntityNotFoundException("Account-not-found-with-id: " + id));
+                repo.findById(id).orElseThrow(() -> new EntityNotFoundException("account-not-found"));
         result.setId(id);
         result.setUsername(account.getUsername());
         String role = account.getRole().getName();

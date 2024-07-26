@@ -57,7 +57,7 @@ public class CenterServiceImpl implements CenterService {
             throw new EntityExistsException("center-name-existed");
         }
 
-        Center center = repo.findById(id).orElseThrow(() -> new EntityNotFoundException("not-found-with-id"));
+        Center center = repo.findById(id).orElseThrow(() -> new EntityNotFoundException("center-not-found"));
         center.setName(request.getName());
         center.setAddress(request.getAddress());
         center.setUpdatedBy(uid);
@@ -75,7 +75,7 @@ public class CenterServiceImpl implements CenterService {
 
     @Override
     public String deleteCenter(Long id) {
-        Center center = repo.findById(id).orElseThrow(() -> new EntityNotFoundException("not-found-with-id"));
+        Center center = repo.findById(id).orElseThrow(() -> new EntityNotFoundException("center-not-found"));
         if (repo.existsByParentId(id)) {
             throw new EntityExistsException("center-is-parent");
         }
@@ -93,7 +93,7 @@ public class CenterServiceImpl implements CenterService {
 
     @Override
     public Center getById(String uid, Long id) {
-        Center center = repo.findById(id).orElseThrow(() -> new EntityNotFoundException("not-found-with-id"));
+        Center center = repo.findById(id).orElseThrow(() -> new EntityNotFoundException("center-not-found"));
 
         if (!authenticationService.checkAdminRole(uid) && !authenticationService.checkEmployeeCenter(uid, id)) {
             throw new AccessDeniedException("no-permission");
@@ -112,7 +112,7 @@ public class CenterServiceImpl implements CenterService {
         Center destinationCenter = null;
 
         if (request.getSourceCenterIds().size() != 2) {
-            throw new RuntimeException("num-of-source-center-is-two");
+            throw new RuntimeException("num-of-source-center-is-not-two");
         }
 
         if (request.getDestinationCenterId() != null) {
@@ -124,7 +124,7 @@ public class CenterServiceImpl implements CenterService {
                 }
                 destinationCenter = repo.findById(request.getDestinationCenterId())
                         .orElseThrow(() -> new EntityNotFoundException(
-                                "center-not-found-with-id: " + request.getDestinationCenterId()));
+                                "center-not-found"));
             }
         } else {
             if (request.getNewCenter() == null) {
@@ -134,7 +134,7 @@ public class CenterServiceImpl implements CenterService {
 
         List<Center> centerDelete = repo.findAllById(request.getSourceCenterIds());
         if (centerDelete.size() != request.getSourceCenterIds().size()) {
-            throw new EntityNotFoundException("center-not-found-with-source-center");
+            throw new EntityNotFoundException("center-not-found");
         }
 
         if (destinationCenter == null) {

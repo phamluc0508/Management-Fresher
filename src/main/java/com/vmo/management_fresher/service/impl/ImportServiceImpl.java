@@ -57,9 +57,9 @@ public class ImportServiceImpl implements ImportService {
         Position position = positionRepo
                 .findById(Constant.FRESHER_POSITION)
                 .orElseThrow(() ->
-                        new EntityNotFoundException("position-not-found-with-name: " + Constant.FRESHER_POSITION));
+                        new EntityNotFoundException("position-not-found"));
         Role role = roleRepo.findById(Constant.FRESHER_ROLE)
-                .orElseThrow(() -> new EntityNotFoundException("role-not-found-with: " + Constant.FRESHER_ROLE));
+                .orElseThrow(() -> new EntityNotFoundException("role-not-found"));
 
         try (Workbook workbook = createWorkbook(file)) {
             Sheet sheet = workbook.getSheetAt(0);

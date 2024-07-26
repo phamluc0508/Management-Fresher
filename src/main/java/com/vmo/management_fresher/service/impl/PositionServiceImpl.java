@@ -45,7 +45,7 @@ public class PositionServiceImpl implements PositionService {
         valid(request);
 
         Position position = repo.findById(name)
-                .orElseThrow(() -> new EntityNotFoundException("position-not-found-with-name: " + name));
+                .orElseThrow(() -> new EntityNotFoundException("position-not-found"));
         position.setName(request.getName());
         position.setDescription(request.getDescription());
         position.setUpdatedBy(uid);
@@ -56,15 +56,15 @@ public class PositionServiceImpl implements PositionService {
     @Override
     public String deletePosition(String name) {
         var exist = repo.findById(name)
-                .orElseThrow(() -> new EntityNotFoundException("position-not-found-with-name: " + name));
-        repo.deleteById(name);
+                .orElseThrow(() -> new EntityNotFoundException("position-not-found"));
+        repo.delete(exist);
         return "successfully delete position with id: " + name;
     }
 
     @Override
     public Position getById(String name) {
         return repo.findById(name)
-                .orElseThrow(() -> new EntityNotFoundException("position-not-found-with-name: " + name));
+                .orElseThrow(() -> new EntityNotFoundException("position-not-found"));
     }
 
     @Override

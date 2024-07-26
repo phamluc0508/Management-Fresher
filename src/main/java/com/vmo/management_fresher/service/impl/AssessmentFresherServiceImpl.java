@@ -35,7 +35,7 @@ public class AssessmentFresherServiceImpl implements AssessmentFresherService {
     public AssessmentFresher addAssessmentFresher(String uid, Long employeeId, Long assessmentId) {
         Assessment assessment = assessmentRepo
                 .findById(assessmentId)
-                .orElseThrow(() -> new EntityNotFoundException("assessment-not-found-with-id: " + assessmentId));
+                .orElseThrow(() -> new EntityNotFoundException("assessment-not-found"));
 
         if (!authenticationService.checkAdminRole(uid)
                 && (!authenticationService.checkDirectorCenter(uid, assessment.getCenterId())
@@ -68,7 +68,7 @@ public class AssessmentFresherServiceImpl implements AssessmentFresherService {
     public AssessmentFresher updatePointAndProgrammingLanguage(
             String uid, Long id, PointProgrammingLanguageReq request) {
         AssessmentFresher assessmentFresher = repo.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("assessment-fresher-not-found-with-id: " + id));
+                .orElseThrow(() -> new EntityNotFoundException("assessment-fresher-not-found"));
 
         if (!authenticationService.checkAdminRole(uid)
                 && !authenticationService.checkDirectorFresher(uid, assessmentFresher.getEmployeeId())) {
@@ -83,7 +83,7 @@ public class AssessmentFresherServiceImpl implements AssessmentFresherService {
             List<ProgrammingLanguage> programmingLanguages =
                     programmingLanguageRepo.findAllById(request.getProgrammingLanguages());
             if (programmingLanguages.size() == 0) {
-                throw new RuntimeException("invalid-programming-format");
+                throw new RuntimeException("invalid-programming-language-format");
             }
             assessmentFresher.setProgrammingLanguages(new HashSet<>(programmingLanguages));
         }
@@ -95,7 +95,7 @@ public class AssessmentFresherServiceImpl implements AssessmentFresherService {
     @Override
     public String deleteAssessmentFresher(String uid, Long id, Boolean allow) {
         AssessmentFresher assessmentFresher = repo.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("assessment-fresher-not-found-with-id: " + id));
+                    .orElseThrow(() -> new EntityNotFoundException("assessment-fresher-not-found"));
 
         if (!authenticationService.checkAdminRole(uid)
                 && !authenticationService.checkDirectorFresher(uid, assessmentFresher.getEmployeeId())) {
