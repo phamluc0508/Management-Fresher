@@ -2,6 +2,9 @@ package com.vmo.management_fresher.service;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.vmo.management_fresher.base.constant.Constant;
+import com.vmo.management_fresher.model.Role;
+import com.vmo.management_fresher.repository.RoleRepo;
 import jakarta.persistence.EntityExistsException;
 
 import org.assertj.core.api.Assertions;
@@ -21,6 +24,8 @@ import com.vmo.management_fresher.model.Employee;
 import com.vmo.management_fresher.repository.AccountRepo;
 import com.vmo.management_fresher.repository.EmployeeRepo;
 
+import java.util.Optional;
+
 @SpringBootTest
 @TestPropertySource("/service-test.properties")
 public class EmployeeServiceTest {
@@ -32,11 +37,15 @@ public class EmployeeServiceTest {
     private EmployeeRepo employeeRepo;
 
     @MockBean
+    private RoleRepo roleRepo;
+
+    @MockBean
     private AccountRepo accountRepo;
 
     private EmployeeReq request;
     private Employee employee;
     private Account account;
+    private Role role;
 
     @BeforeEach
     void initData() {
@@ -59,6 +68,8 @@ public class EmployeeServiceTest {
                 .build();
 
         account = Account.builder().id("axbycz147").username("test@gmail.com").build();
+
+        role = Role.builder().name("OTHER").description("Other role").build();
     }
 
     @Test
@@ -67,6 +78,7 @@ public class EmployeeServiceTest {
         Mockito.when(employeeRepo.existsByEmail(ArgumentMatchers.anyString())).thenReturn(false);
         Mockito.when(employeeRepo.existsByPhoneNumber(ArgumentMatchers.anyString()))
                 .thenReturn(false);
+        Mockito.when(roleRepo.findById(Constant.OTHER_ROLE)).thenReturn(Optional.ofNullable(role));
         Mockito.when(accountRepo.save(ArgumentMatchers.any())).thenReturn(account);
         Mockito.when(employeeRepo.save(ArgumentMatchers.any())).thenReturn(employee);
 

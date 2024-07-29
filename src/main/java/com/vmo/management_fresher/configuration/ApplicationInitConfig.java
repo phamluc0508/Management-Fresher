@@ -45,6 +45,14 @@ public class ApplicationInitConfig {
                         .build();
                 roleRepo.save(adminRole);
 
+                Role otherRole = Role.builder()
+                        .name(Constant.OTHER_ROLE)
+                        .description("Other role")
+                        .createdBy(SYSTEM_NAME)
+                        .updatedBy(SYSTEM_NAME)
+                        .build();
+                roleRepo.save(otherRole);
+
                 accountRepo.save(Account.builder()
                         .username(ADMIN_USER_NAME)
                         .password(passwordEncoder.encode(adminPassword))
